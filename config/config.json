@@ -1,0 +1,23 @@
+{
+  "development": {
+    "username": "root",
+    "password": null,
+    "database": "database_development",
+    "use_env_variable": "DATABASE_URL",
+    "dialect": "mysql"
+  },
+  "test": {
+    "username": "root",
+    "password": null,
+    "database": "database_test",
+    "use_env_variable": "DATABASE_URL",
+    "dialect": "mysql"
+  },
+  "production": {
+    "username": "root",
+    "password": null,
+    "database": "database_test",
+    "use_env_variable": "DATABASE_URL",
+    "dialect": "mysql"
+  }
+}
