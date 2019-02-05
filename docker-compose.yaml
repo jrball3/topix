@@ -1,4 +1,4 @@
-version: '2'
+version: '3'
 services:
   web:
     build: .
@@ -8,7 +8,7 @@ services:
     depends_on:
       - postgres
     environment:
-      DATABASE_URL: ${DATABASE_URI}
+      DATABASE_URI: ${DATABASE_URI}
       API_PORT: ${API_PORT}
   postgres:
     image: postgres:11-alpine
@@ -16,4 +16,3 @@ services:
       POSTGRES_USER: ${POSTGRES_USER} 
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-
