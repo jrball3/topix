@@ -11,5 +11,10 @@ module.exports = (sequelize, DataTypes) => {
   User.associate = function(models) {
     // associations can be defined here
   };
+  User.authenticate = (username, password) => {
+    User.findAll({ where: { username } }).then((user) => {
+      return Promise.resolve(user);
+    });
+  };
   return User;
 };
