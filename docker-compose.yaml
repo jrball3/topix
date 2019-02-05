@@ -1,0 +1,19 @@
+version: '2'
+services:
+  web:
+    build: .
+    command: start
+    ports:
+      - "${API_PORT}:${API_PORT}"
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: ${DATABASE_URI}
+      API_PORT: ${API_PORT}
+  postgres:
+    image: postgres:11-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER} 
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
