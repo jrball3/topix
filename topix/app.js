@@ -11,7 +11,10 @@ const app = restify.createServer();
 app.use(restify.plugins.queryParser());
 app.use(restify.plugins.bodyParser());
 
-const auth = new V1AuthApi(['/api/v1/hello*']);
+const auth = new V1AuthApi([
+  /api\/v1\/hello.*/,
+  /api\/v1\/auth.*/
+]);
 auth.apply(app);
 
 const hello = new V1HelloApi();

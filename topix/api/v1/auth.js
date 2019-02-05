@@ -8,8 +8,9 @@ export class V1AuthApi {
 
   apply(app) {
     // using restify-jwt to lock down everything except /auth
+    console.log(this.exclusions);
     app.use(rjwt({secret: process.env.JWT_SECRET}).unless({
-        path: this.exclusions,
+      path: this.exclusions,
     }));
 
     app.post('/api/v1/auth', (req, res, next) => {
