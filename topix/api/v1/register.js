@@ -1,16 +1,16 @@
-import User from './models/user';
-import PasswordHash from './utilities/passwords';
+import models from '../../models';
+import PasswordHash from '../../utilities/passwords';
 
-class V1RegisterApi {
-  apply = (app) => {
+export class V1RegisterApi {
+  apply(app) {
     // using the `req.user` object provided by restify-jwt
-    app.post('api/v1/register', (req, res, next) => {
-      const user = User.build({
+    app.post('/api/v1/register', (req, res, next) => {
+      const user = models.User.build({
         first_name: req.params.first_name,
         last_name: req.params.last_name,
         username: req.params.username,
         display_name: req.params.display_name,
-        email: req.params.email;
+        email: req.params.email,
       });
       PasswordHash.hash(req.params.password).then((hashedPassword) => {
         user.password_hash = hashedPassword;
@@ -22,3 +22,5 @@ class V1RegisterApi {
     });
   }
 }
+
+export default V1RegisterApi;

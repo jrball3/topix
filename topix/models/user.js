@@ -1,4 +1,5 @@
-'use strict';
+import PasswordHash from '../utilities/passwords';
+
 module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define('User', {
     first_name: DataTypes.STRING,
@@ -13,7 +14,8 @@ module.exports = (sequelize, DataTypes) => {
   };
   User.authenticate = (username, password) => {
     User.findAll({ where: { username } }).then((user) => {
-      return Promise.resolve(user);
+      if (user) return PasswordHash.compare(password, user.password);
+      return False;
     });
   };
   return User;

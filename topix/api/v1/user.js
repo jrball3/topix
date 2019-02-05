@@ -1,13 +1,15 @@
-import User from './models/user';
+import models from '../../models';
 
-class V1UserApi {
-  apply = (app) => {
+export class V1UserApi {
+  apply(app) {
     // using the `req.user` object provided by restify-jwt
-    app.get('api/v1/user', (req, res, next) => {
-      User.findAll({ where: { id: req.params.id } }).then((user) => {
+    app.get('/api/v1/user', (req, res, next) => {
+      models.User.findAll({ where: { id: req.params.id } }).then((user) => {
         res.send(req.user);
         next();
       });
     });
   }
 }
+
+export default V1UserApi;
