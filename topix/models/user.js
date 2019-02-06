@@ -1,22 +1,41 @@
-import PasswordHash from '../utilities/passwords';
+const mongoose = require('mongoose');
+const validator = require('validator');
+const passwords = require('../utilities/passwords');
+const timestamp = require('./plugins/timestamp');
 
-module.exports = (sequelize, DataTypes) => {
-  const User = sequelize.define('User', {
-    first_name: DataTypes.STRING,
-    last_name: DataTypes.STRING,
-    username: DataTypes.STRING,
-    display_name: DataTypes.STRING,
-    email: DataTypes.STRING,
-    password_hash: DataTypes.STRING
-  }, {});
-  User.associate = function(models) {
-    // associations can be defined here
-  };
-  User.authenticate = (username, password) => {
-    User.findAll({ where: { username } }).then((user) => {
-      if (user) return PasswordHash.compare(password, user.password);
-      return False;
-    });
-  };
-  return User;
-};
+const userSchema = new mongoose.Schema({
+  first_name: {
+    type: String,
+    lowercase: true,
+  },
+  last_name: {
+    type: String,
+    lowercase: true,
+  },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+    lowercase: true,
+    validate: (value) => {
+      return validator.isEmail(value)
+    }
+  },
+  username: {
+    type: String,
+    required: true,
+    unique: true,
+    lowercase: true,
+  },
+  display_name: String,
+  password_hash: {
+    type: String,
+    required: true,
+  },
+  createdAt: Date,
+  updatedAt: Date,
+});
+
+userSchema.plugin(timestamp);
+
+module.exports = mongoose.model('User', userSchema);

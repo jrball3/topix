@@ -26,6 +26,8 @@ user.apply(app);
 const register = new V1RegisterApi();
 register.apply(app);
 
-app.listen(process.env.API_PORT, function() {
+const port = process.env.API_PORT;
+
+app.listen(port, function() {
   console.log('%s listening at %s', app.name, app.url);
 });

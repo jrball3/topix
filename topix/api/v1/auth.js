@@ -1,5 +1,7 @@
-import models from '../../models';
+const UserModel = require('../../models/user');
 const rjwt = require('restify-jwt-community');
+const auth = require('../../utilities/authenticate');
+const errors = require('restify-errors');
 
 export class V1AuthApi {
   constructor(exclusions) {
@@ -8,14 +10,14 @@ export class V1AuthApi {
 
   apply(app) {
     // using restify-jwt to lock down everything except /auth
-    console.log(this.exclusions);
     app.use(rjwt({secret: process.env.JWT_SECRET}).unless({
       path: this.exclusions,
     }));
 
     app.post('/api/v1/auth', (req, res, next) => {
-        let { username, password } = req.body;
-        models.User.authenticate(username, password).then(data => {
+        const { username, password } = req.body;
+        auth.authenticate(username, password)
+          .then(data => {
             // creating jsonwebtoken using the secret from config
             let token = jwt.sign(data, process.env.JWT_SECRET, {
                 expiresIn: '30d'
@@ -25,7 +27,11 @@ export class V1AuthApi {
             let { iat, exp } = jwt.decode(token);
             res.send({ iat, exp, token });
             next();
-        })
+          })
+          .catch(err => {
+            res.send(new errors.BadRequestError(err));
+            next();
+          });
     });
   }
 }
