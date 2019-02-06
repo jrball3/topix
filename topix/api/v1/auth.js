@@ -28,6 +28,7 @@ export class V1AuthApi {
             const token = jwt.sign(user.toObject(), process.env.JWT_SECRET, {
               expiresIn: '30d'
             })
+
             // retrieve issue and expiration times
             const { iat, exp } = jwt.decode(token)
             res.send({ 'createdAt': iat, 'expiresAt': exp, token })
