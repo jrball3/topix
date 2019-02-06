@@ -1,1 +1,1 @@
-export $(grep -v '^#' topix/.env | xargs)
+export $(grep -v '^#' .env | xargs)

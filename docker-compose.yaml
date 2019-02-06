@@ -1,21 +1,23 @@
 version: '3'
 services:
-  topix_user_api:
+  user_api:
     build: .
     command: start
     ports:
       - "${API_PORT}:${API_PORT}"
     depends_on:
-      - topix_db
+      - db
     environment:
-      MONGO_HOST: topix_db
-      MONGO_USER: ${MONGO_USER}
+      MONGO_HOST: db
+      MONGO_USERNAME: ${MONGO_USERNAME}
       MONGO_DATABASE: ${MONGO_DATABASE}
       MONGO_PASSWORD: ${MONGO_PASSWORD}
+      MONGO_PORT: 27017
+      JWT_SECRET: ${JWT_SECRET}
       API_PORT: ${API_PORT}
-  topix_db:
+  db:
     image: mongo:4-xenial
     environment:
-      MONGO_USER: ${MONGO_USER}
-      MONGO_DATABASE: ${MONGO_DATABASE}
-      MONGO_PASSWORD: ${MONGO_PASSWORD}
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_DATABASE}
