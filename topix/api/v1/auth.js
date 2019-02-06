@@ -15,7 +15,7 @@ export class V1AuthApi {
     }));
 
     app.post('/api/v1/auth', (req, res, next) => {
-        const { username, password } = req.body;
+        const { username, password } = req.params;
         auth.authenticate(username, password)
           .then(data => {
             // creating jsonwebtoken using the secret from config

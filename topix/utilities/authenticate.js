@@ -5,9 +5,7 @@ class Authenticate {
   authenticate(username, password) {
     return new Promise(function(resolve, reject) {
       UserModel
-        .find({
-          username: req.params.username,
-        })
+        .find({ username })
         .then(doc => {
           resolve(Passwords.compare(password, doc.password));
         })
