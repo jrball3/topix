@@ -20,7 +20,7 @@ export class V1AuthApi {
         .then(
           user => {
             if (!user) {
-              res.send(new errors.UnauthorizedError())
+              res.send(new errors.UnauthorizedError('Invalid username or password.'))
               next()
               return
             }

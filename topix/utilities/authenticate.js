@@ -14,17 +14,10 @@ class Authenticate {
               resolve(null)
               return
             }
-            Passwords.hash(password)
-              .then(
-                hashed => {
-                  const same = Passwords.compare(hashed, user.passwordHash)
-                  resolve(same ? user : null)
-                },
-                err => {
-                  console.log(err)
-                  reject(err)
-                }
-              )
+            Passwords.compare(password, user.passwordHash).then(
+              equal => resolve(equal ? user : null),
+              err => reject(err)
+            )
           },
           err => {
             console.error(err)
