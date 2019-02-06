@@ -9,7 +9,6 @@ class Authenticate {
         .then(
           doc => {
             const user = doc[0]
-            console.log(user)
             if (!user) {
               resolve(null)
               return
