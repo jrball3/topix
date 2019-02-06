@@ -1,16 +1,15 @@
-const mongoose = require('mongoose');
-const validator = require('validator');
-const passwords = require('../utilities/passwords');
-const timestamp = require('./plugins/timestamp');
+const mongoose = require('mongoose')
+const validator = require('validator')
+const timestamp = require('./plugins/timestamp')
 
 const userSchema = new mongoose.Schema({
-  first_name: {
+  firstName: {
     type: String,
-    lowercase: true,
+    lowercase: true
   },
-  last_name: {
+  lastName: {
     type: String,
-    lowercase: true,
+    lowercase: true
   },
   email: {
     type: String,
@@ -25,17 +24,17 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     unique: true,
-    lowercase: true,
+    lowercase: true
   },
-  display_name: String,
-  password_hash: {
+  displayName: String,
+  passwordHash: {
     type: String,
-    required: true,
+    required: true
   },
   createdAt: Date,
-  updatedAt: Date,
-});
+  updatedAt: Date
+})
 
-userSchema.plugin(timestamp);
+userSchema.plugin(timestamp)
 
-module.exports = mongoose.model('User', userSchema);
+module.exports = mongoose.model('User', userSchema)
