@@ -27,7 +27,6 @@ export class V1RegisterApi {
           });
           user.save()
             .then(doc => {
-              console.log(doc)
               res.send(doc);
               next();
             })
