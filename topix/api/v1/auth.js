@@ -30,7 +30,7 @@ export class V1AuthApi {
             })
             // retrieve issue and expiration times
             const { iat, exp } = jwt.decode(token)
-            res.send({ iat, exp, token })
+            res.send({ 'createdAt': iat, 'expiresAt': exp, token })
             next()
           },
           err => {
