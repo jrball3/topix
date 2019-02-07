@@ -1,6 +1,6 @@
 const errors = require('restify-errors')
 const Joi = require('joi')
-const validator = require('../../middleware/validate')
+const validator = require('../../chains/validate')
 const UserModel = require('../../models/user')
 const passwords = require('../../utilities/passwords')
 
