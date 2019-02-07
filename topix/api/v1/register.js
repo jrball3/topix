@@ -25,34 +25,27 @@ export class V1RegisterApi {
         password
       } = req.body
 
-      passwords.hash(password)
-        .then(
-          hashedPassword => {
-            const user = new UserModel({
-              firstName,
-              lastName,
-              username,
-              displayName,
-              email,
-              passwordHash: hashedPassword
+      passwords.hash(password).then(
+        hashedPassword => {
+          const user = new UserModel({
+            firstName,
+            lastName,
+            username,
+            displayName,
+            email,
+            passwordHash: hashedPassword
+          })
+          user.save().then(
+            doc => {
+              res.send(doc)
+              return next()
+            },
+            err => {
+              console.error(err)
+              res.send(new errors.BadRequestError(err))
+              return next()
             })
-            user.save()
-              .then(
-                doc => {
-                  res.send(doc)
-                  return next()
-                },
-                err => {
-                  console.error(err)
-                  res.send(new errors.BadRequestError(err))
-                  return next()
-                })
-          },
-          err => {
-            res.send(new errors.InternalServerError(err))
-            return next()
-          }
-        )
+        })
         .catch(err => {
           console.error(err)
           res.send(new errors.InternalServerError(err))
