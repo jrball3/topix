@@ -1,7 +1,7 @@
 const rjwt = require('restify-jwt-community')
 const jwt = require('jsonwebtoken')
-const auth = require('../../utilities/authenticate')
 const errors = require('restify-errors')
+const UserModel = require('../../models/user')
 
 export class V1AuthApi {
   constructor (exclusions) {
@@ -15,36 +15,40 @@ export class V1AuthApi {
     }))
 
     app.post('/api/v1/auth', (req, res, next) => {
-      const { username, password } = req.params
-      auth.authenticate(username, password)
-        .then(
-          user => {
-            if (!user) {
-              res.send(new errors.UnauthorizedError('Invalid username or password.'))
-              next()
-              return
-            }
-            // creating jsonwebtoken using the secret from config
-            const token = jwt.sign(user.toObject(), process.env.JWT_SECRET, {
-              expiresIn: '30d'
-            })
-
-            // retrieve issue and expiration times
-            const { iat, exp } = jwt.decode(token)
-            res.send({ 'createdAt': iat, 'expiresAt': exp, token })
+      const { username, password } = req.body
+      UserModel.find({ username }).then(
+        (doc) => {
+          const user = doc[0]
+          if (!user) {
+            res.send(new errors.UnauthorizedError('Invalid username or password.'))
             next()
-          },
-          err => {
-            console.log(err)
-            res.send(new errors.BadRequestError(err))
-            next()
+            return
           }
-        )
-        .catch(err => {
-          console.log(err)
-          res.send(new errors.InternalServerError(err))
+
+          user.authenticate(password)
+            .then(
+              (success) => {
+                if (!success) {
+                  res.send(new errors.UnauthorizedError('Invalid username or password.'))
+                  next()
+                  return
+                }
+                // creating jsonwebtoken using the secret from config
+                const token = jwt.sign(user.username, process.env.JWT_SECRET, {
+                  expiresIn: '30d'
+                })
+                // retrieve issue and expiration times
+                const { iat, exp } = jwt.decode(token)
+                res.send({ 'createdAt': iat, 'expiresAt': exp, token })
+                next()
+              }
+            )
+        },
+        (err) => {
+          res.sent(new errors.InternalServerError(err))
           next()
-        })
+        }
+      )
     })
   }
 }

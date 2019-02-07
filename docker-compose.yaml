@@ -2,7 +2,7 @@ version: '3'
 services:
   user_api:
     build: .
-    command: start
+    command: sh -c "/wait && npm start"
     ports:
       - "${API_PORT}:${API_PORT}"
     depends_on:
@@ -15,6 +15,7 @@ services:
       MONGO_PORT: 27017
       JWT_SECRET: ${JWT_SECRET}
       API_PORT: ${API_PORT}
+      WAIT_HOSTS: db:27017
   db:
     image: vepo/mongo
     ports:

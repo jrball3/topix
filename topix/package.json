@@ -16,17 +16,20 @@
     "dotenv": "^6.0.0",
     "eslint": "^4.19.1",
     "jsonwebtoken": "^8.4.0",
-    "mocha": "^5.2.0",
     "mongoose": "^5.4.10",
     "nodemon": "^1.18.9",
     "restify": "^7.7.0",
     "restify-errors": "^6.1.1",
     "restify-jwt-community": "^1.0.9",
     "sequelize-cli": "^4.1.1",
-    "validator": "^10.11.0"
+    "validator": "^10.11.0",
+    "joi": "^14.3.1"
   },
   "devDependencies": {
     "eslint-config-airbnb-base": "^12.1.0",
-    "eslint-plugin-import": "^2.11.0"
+    "eslint-plugin-import": "^2.11.0",
+    "mocha": "^5.2.0",
+    "supertest": "^3.4.2",
+    "chai": "^4.2.0"
   }
 }
