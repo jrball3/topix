@@ -1,5 +1,6 @@
 const errors = require('restify-errors')
 const Joi = require('joi')
+const validator = require('../../middleware/validate')
 const UserModel = require('../../models/user')
 const passwords = require('../../utilities/passwords')
 
@@ -14,57 +15,49 @@ export class V1RegisterApi {
       email: Joi.string().required()
     })
 
-    app.post('/api/v1/register', (req, res, next) => {
-      Joi.validate(req.body, schema, (err, value) => {
-        if (err) {
-          res.send(new errors.BadRequestError(err))
-          next()
-          return
-        }
+    app.post('/api/v1/register', validator(schema), (req, res, next) => {
+      const {
+        firstName,
+        lastName,
+        username,
+        displayName,
+        email,
+        password
+      } = req.body
 
-        const {
-          firstName,
-          lastName,
-          username,
-          displayName,
-          email,
-          password
-        } = req.body
-
-        passwords.hash(password)
-          .then(
-            hashedPassword => {
-              const user = new UserModel({
-                firstName,
-                lastName,
-                username,
-                displayName,
-                email,
-                passwordHash: hashedPassword
-              })
-              user.save()
-                .then(
-                  doc => {
-                    res.send(doc)
-                    next()
-                  },
-                  err => {
-                    console.error(err)
-                    res.send(new errors.BadRequestError(err))
-                    next()
-                  })
-            },
-            err => {
-              res.send(new errors.InternalServerError(err))
-              next()
-            }
-          )
-          .catch(err => {
-            console.error(err)
+      passwords.hash(password)
+        .then(
+          hashedPassword => {
+            const user = new UserModel({
+              firstName,
+              lastName,
+              username,
+              displayName,
+              email,
+              passwordHash: hashedPassword
+            })
+            user.save()
+              .then(
+                doc => {
+                  res.send(doc)
+                  return next()
+                },
+                err => {
+                  console.error(err)
+                  res.send(new errors.BadRequestError(err))
+                  return next()
+                })
+          },
+          err => {
             res.send(new errors.InternalServerError(err))
-            next()
-          })
-      })
+            return next()
+          }
+        )
+        .catch(err => {
+          console.error(err)
+          res.send(new errors.InternalServerError(err))
+          return next()
+        })
     })
   }
 }

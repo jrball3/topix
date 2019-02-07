@@ -3,7 +3,7 @@ const should = require('chai').should()
 const expect = require('chai').expect
 const supertest = require('supertest')
 
-const url = `http://localhost:${process.env.API_PORT}`
+const url = `http://localhost:3000`
 const api = supertest(url)
 
 /* global describe it */

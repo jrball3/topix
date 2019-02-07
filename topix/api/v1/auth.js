@@ -21,8 +21,7 @@ export class V1AuthApi {
           const user = doc[0]
           if (!user) {
             res.send(new errors.UnauthorizedError('Invalid username or password.'))
-            next()
-            return
+            return next()
           }
 
           user.authenticate(password)
@@ -30,8 +29,7 @@ export class V1AuthApi {
               (success) => {
                 if (!success) {
                   res.send(new errors.UnauthorizedError('Invalid username or password.'))
-                  next()
-                  return
+                  return next()
                 }
                 // creating jsonwebtoken using the secret from config
                 const token = jwt.sign(user.username, process.env.JWT_SECRET, {
@@ -40,13 +38,13 @@ export class V1AuthApi {
                 // retrieve issue and expiration times
                 const { iat, exp } = jwt.decode(token)
                 res.send({ 'createdAt': iat, 'expiresAt': exp, token })
-                next()
+                return next()
               }
             )
         },
         (err) => {
           res.sent(new errors.InternalServerError(err))
-          next()
+          return next()
         }
       )
     })
