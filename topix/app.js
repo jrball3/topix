@@ -23,8 +23,6 @@ user.apply(app)
 const register = new V1RegisterApi()
 register.apply(app)
 
-const port = process.env.API_PORT
-
-app.listen(port, function () {
+app.listen(3000, function () {
   console.log('%s listening at %s', app.name, app.url)
 })
