@@ -1,29 +1,34 @@
 const expect = require('chai').expect
 const supertest = require('supertest')
 const util = require('util')
-const createUser = require('./helpers').createUser
+const faker = require('faker')
 
 const url = `http://localhost:3000`
 const api = supertest(url)
 
-/* global describe it before beforeEach afterEach */
+/* global describe it before afterEach */
 
 describe('api', function () {
   describe('v1', function () {
     describe('auth', function () {
-      let user, response
+      this.timeout(10000)
+      let response
+      const user = {
+        firstName: faker.name.firstName(),
+        lastName: faker.name.lastName(),
+        email: faker.internet.email(),
+        username: faker.internet.userName(),
+        password: faker.internet.password()
+      }
 
       before(function (done) {
-        createUser()
-          .then((doc) => {
-            user = doc
-            console.log('save done!')
-            console.log('is new?? ' + doc.isNew)
+        api.post('/api/v1/register')
+          .set('Accept', 'application/x-www-form-urlencoded')
+          .send(user)
+          .expect(200)
+          .end(function (err, res) {
+            if (err) throw err
             done()
-          })
-          .catch(err => {
-            console.error('something is fucked')
-            throw err
           })
       })
 

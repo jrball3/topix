@@ -1,8 +1,6 @@
 import V1UserApi from './api/v1/user'
 import V1AuthApi from './api/v1/auth'
 import V1RegisterApi from './api/v1/register'
-require('./database')
-require('dotenv').config()
 
 const restify = require('restify')
 
