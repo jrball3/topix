@@ -6,11 +6,11 @@ const Passwords = require('../utilities/passwords')
 const userSchema = new mongoose.Schema({
   firstName: {
     type: String,
-    lowercase: true
+    required: true
   },
   lastName: {
     type: String,
-    lowercase: true
+    required: true
   },
   email: {
     type: String,
