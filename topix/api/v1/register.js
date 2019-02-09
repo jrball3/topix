@@ -27,7 +27,7 @@ class V1RegisterApi {
       passwords
         .hash(password)
         .then(hashedPassword => {
-          const user = new UserModel({
+          return new UserModel({
             firstName,
             lastName,
             username,
@@ -35,8 +35,13 @@ class V1RegisterApi {
             email,
             passwordHash: hashedPassword
           })
-          return user.save()
         })
+        .catch(err => {
+          console.error(err)
+          res.send(new errors.InternalServerError(err))
+          return next()
+        })
+        .then(userModel => userModel.save())
         .then(doc => {
           res.send(doc)
           return next()

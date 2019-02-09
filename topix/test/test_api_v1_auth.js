@@ -5,8 +5,9 @@ chai.use(chaiHttp)
 const util = require('util')
 const faker = require('faker')
 
-/* global describe it before afterEach */
 const url = 'http://localhost:3000'
+
+/* global describe it before afterEach */
 
 describe('api', function () {
   describe('v1', function () {
