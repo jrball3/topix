@@ -4,7 +4,7 @@ const validator = require('../../chains/validate')
 const UserModel = require('../../models/user')
 const passwords = require('../../utilities/passwords')
 
-export class V1RegisterApi {
+class V1RegisterApi {
   apply (app) {
     const schema = Joi.object().keys({
       firstName: Joi.string().required(),
@@ -24,9 +24,9 @@ export class V1RegisterApi {
         email,
         password
       } = req.body
-
-      passwords.hash(password).then(
-        hashedPassword => {
+      passwords
+        .hash(password)
+        .then(hashedPassword => {
           const user = new UserModel({
             firstName,
             lastName,
@@ -35,24 +35,19 @@ export class V1RegisterApi {
             email,
             passwordHash: hashedPassword
           })
-          user.save().then(
-            doc => {
-              res.send(doc)
-              return next()
-            },
-            err => {
-              console.error(err)
-              res.send(new errors.BadRequestError(err))
-              return next()
-            })
+          return user.save()
+        })
+        .then(doc => {
+          res.send(doc)
+          return next()
         })
         .catch(err => {
           console.error(err)
-          res.send(new errors.InternalServerError(err))
+          res.send(new errors.BadRequestError(err))
           return next()
         })
     })
   }
 }
 
-export default V1RegisterApi
+module.exports = { V1RegisterApi }

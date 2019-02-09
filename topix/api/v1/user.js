@@ -1,4 +1,4 @@
-export class V1UserApi {
+class V1UserApi {
   apply (app) {
     app.get('/api/v1/user', (req, res, next) => {
       // using the `req.user` object provided by restify-jwt
@@ -8,4 +8,4 @@ export class V1UserApi {
   }
 }
 
-export default V1UserApi
+module.exports = { V1UserApi }

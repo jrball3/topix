@@ -1,17 +1,16 @@
-const expect = require('chai').expect
-const supertest = require('supertest')
+const chai = require('chai')
+const expect = chai.expect
+const chaiHttp = require('chai-http')
+chai.use(chaiHttp)
 const util = require('util')
 const faker = require('faker')
 
-const url = `http://localhost:3000`
-const api = supertest(url)
-
 /* global describe it before afterEach */
+const url = 'http://localhost:3000'
 
 describe('api', function () {
   describe('v1', function () {
     describe('auth', function () {
-      this.timeout(10000)
       let response
       const user = {
         firstName: faker.name.firstName(),
@@ -22,44 +21,46 @@ describe('api', function () {
       }
 
       before(function (done) {
-        api.post('/api/v1/register')
+        chai.request(url)
+          .post('/api/v1/register')
           .set('Accept', 'application/x-www-form-urlencoded')
           .send(user)
-          .expect(200)
           .end(function (err, res) {
+            response = res
             if (err) throw err
+            expect(res).to.have.status(200)
             done()
           })
       })
 
       it('should not auth with the wrong password', function (done) {
-        api.post('/api/v1/auth')
+        chai.request(url)
+          .post('/api/v1/auth')
           .set('Accept', 'application/x-www-form-urlencoded')
           .send({
             username: user.username,
             password: 'badpassword'
           })
-          .expect(401)
           .end(function (err, res) {
-            if (err) throw err
             response = res
+            if (err) throw err
+            expect(res).to.have.status(401)
             done()
           })
       })
 
       it('should auth with the correct password', function (done) {
-        api.post('/api/v1/auth')
+        chai.request(url)
+          .post('/api/v1/auth')
           .set('Accept', 'application/x-www-form-urlencoded')
           .send({
             username: user.username,
             password: user.password
           })
-          .expect(200)
           .end(function (err, res) {
-            if (err) throw err
             response = res
-            console.log(res.body)
-            console.log(res.statusCode)
+            if (err) throw err
+            expect(res).to.have.status(200)
             expect(res.body.createdAt).to.not.equal(null)
             expect(res.body.expiredAt).to.not.equal(null)
             expect(res.body.token).to.not.equal(null)

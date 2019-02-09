@@ -1,7 +1,6 @@
-import V1UserApi from './api/v1/user'
-import V1AuthApi from './api/v1/auth'
-import V1RegisterApi from './api/v1/register'
-
+const V1UserApi = require('./api/v1/user').V1UserApi
+const V1AuthApi = require('./api/v1/auth').V1AuthApi
+const V1RegisterApi = require('./api/v1/register').V1RegisterApi
 const restify = require('restify')
 
 const app = restify.createServer()
@@ -21,6 +20,4 @@ user.apply(app)
 const register = new V1RegisterApi()
 register.apply(app)
 
-app.listen(3000, function () {
-  console.log('%s listening at %s', app.name, app.url)
-})
+module.exports = app

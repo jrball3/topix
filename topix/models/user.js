@@ -38,13 +38,8 @@ const userSchema = new mongoose.Schema({
 
 userSchema.plugin(timestamp)
 
-userSchema.methods.authenticate = (password) => {
-  return new Promise(function (resolve, reject) {
-    Passwords.compare(password, this.passwordHash).then(
-      equal => resolve(equal),
-      err => reject(err)
-    )
-  })
+userSchema.methods.authenticate = function (password) {
+  return Passwords.compare(password, this.passwordHash)
 }
 
 module.exports = mongoose.model('User', userSchema)

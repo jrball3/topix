@@ -1,10 +1,11 @@
-const expect = require('chai').expect
-const supertest = require('supertest')
-const faker = require('faker')
+const chai = require('chai')
+const expect = chai.expect
+const chaiHttp = require('chai-http')
+chai.use(chaiHttp)
 const util = require('util')
+const faker = require('faker')
 
 const url = `http://localhost:3000`
-const api = supertest(url)
 
 /* global describe it beforeEach afterEach */
 
@@ -24,7 +25,8 @@ describe('api', function () {
       })
 
       it('should fail with no username', function (done) {
-        api.post('/api/v1/register')
+        chai.request(url)
+          .post('/api/v1/register')
           .set('Accept', 'application/x-www-form-urlencoded')
           .send({
             firstName,
@@ -32,17 +34,18 @@ describe('api', function () {
             email,
             password
           })
-          .expect(400)
           .end(function (err, res) {
-            if (err) throw err
             response = res
+            if (err) throw err
+            expect(res).to.have.status(400)
             done()
           })
           /* eslint-disable-next-line handle-callback-err */
       })
 
       it('should fail with no email', function (done) {
-        api.post('/api/v1/register')
+        chai.request(url)
+          .post('/api/v1/register')
           .set('Accept', 'application/x-www-form-urlencoded')
           .send({
             firstName,
@@ -50,16 +53,17 @@ describe('api', function () {
             username,
             password
           })
-          .expect(400)
           .end(function (err, res) {
             if (err) throw err
             response = res
+            expect(res).to.have.status(400)
             done()
           })
       })
 
       it('should fail with no password', function (done) {
-        api.post('/api/v1/register')
+        chai.request(url)
+          .post('/api/v1/register')
           .set('Accept', 'application/x-www-form-urlencoded')
           .send({
             firstName,
@@ -67,16 +71,17 @@ describe('api', function () {
             email,
             username
           })
-          .expect(400)
           .end(function (err, res) {
-            if (err) throw err
             response = res
+            if (err) throw err
+            expect(res).to.have.status(400)
             done()
           })
       })
 
       it('should fail with a bad email', function (done) {
-        api.post('/api/v1/register')
+        chai.request(url)
+          .post('/api/v1/register')
           .set('Accept', 'application/x-www-form-urlencoded')
           .send({
             firstName,
@@ -85,28 +90,30 @@ describe('api', function () {
             password,
             email: 'testemailemail.com'
           })
-          .expect(400)
           .end(function (err, res) {
-            if (err) throw err
             response = res
+            if (err) throw err
+            expect(res).to.have.status(400)
             done()
           })
       })
 
       it('should pass with good input', function (done) {
-        api.post('/api/v1/register')
+        const goodUser = {
+          firstName,
+          lastName,
+          email,
+          username,
+          password
+        }
+        chai.request(url)
+          .post('/api/v1/register')
           .set('Accept', 'application/x-www-form-urlencoded')
-          .send({
-            firstName,
-            lastName,
-            email,
-            username,
-            password
-          })
-          .expect(200)
+          .send(goodUser)
           .end(function (err, res) {
-            if (err) throw err
             response = res
+            if (err) throw err
+            expect(res).to.have.status(200)
             expect(res.body.firstName).to.equal(firstName)
             expect(res.body.lastName).to.equal(lastName)
             expect(res.body.username).to.equal(username.toLowerCase())
