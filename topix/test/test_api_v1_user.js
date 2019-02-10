@@ -159,7 +159,7 @@ describe('api', function () {
             })
         })
 
-        it('should pass with good input', function (done) {
+        it('should create a user with good input', function (done) {
           chai.request(url)
             .post('/api/v1/user')
             .set('Accept', 'application/x-www-form-urlencoded')

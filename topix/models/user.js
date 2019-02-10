@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 const validator = require('validator')
 const timestamp = require('./plugins/timestamp')
 const Passwords = require('../utilities/passwords')
-const friends = require('mongoose-friends')
+const friends = require('./plugins/mongoose-friends/plugin')
 
 const userSchema = new mongoose.Schema({
   firstName: {

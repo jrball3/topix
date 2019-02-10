@@ -10,20 +10,40 @@ class V1FriendshipApi {
     })
 
     app.post('/api/v1/friendship', validator(schema), (req, res, next) => {
+      console.log(`friendship post with body: ${JSON.stringify(req.body)}`)
       UserModel
-        .findOne({ username: req.username })
+        .findOne({ username: req.body.username })
         .then((friend) => {
           if (!friend) {
-            res.send(new errors.UnprocessableEntityError(`User with username "${req.username}" not found.`))
+            res.send(new errors.UnprocessableEntityError(`User with username "${req.body.username}" not found.`))
             return next()
           }
-          UserModel.requestFriend(req.user._id, friend._id, function (err, res) {
+
+          UserModel.friendshipBetween(req.user, friend, function (err, doc) {
             if (err) {
-              res.send(new errors.UnprocessableEntityError(err))
+              res.send(new errors.InternalServerError(err))
               return next()
             }
-            res.send(res)
-            return next()
+            if (doc) {
+              console.log(doc)
+              if (doc.status === 'accepted') {
+                res.send(new errors.UnprocessableEntityError('An accepted friendship with this user already exists.'))
+                return next()
+              }
+              if (doc.status === 'pending' || doc.status === 'requested') {
+                res.send(new errors.UnprocessableEntityError('A pending friendship with this user already exists.'))
+                return next()
+              }
+            }
+
+            UserModel.requestFriend(req.user._id, friend._id, function (err, data) {
+              if (err) {
+                res.send(new errors.UnprocessableEntityError(err))
+                return next()
+              }
+              res.send(data)
+              return next()
+            })
           })
         })
         .catch((err) => {
