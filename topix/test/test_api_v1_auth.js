@@ -17,7 +17,7 @@ describe('api', function () {
 
       before(function (done) {
         chai.request(url)
-          .post('/api/v1/register')
+          .post('/api/v1/user')
           .set('Accept', 'application/x-www-form-urlencoded')
           .send(user)
           .end(function (err, res) {

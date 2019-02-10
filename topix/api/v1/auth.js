@@ -1,4 +1,4 @@
-const rjwt = require('restify-jwt-community')
+const rjwt = require('restify-jwt')
 const jwt = require('jsonwebtoken')
 const errors = require('restify-errors')
 const UserModel = require('../../models/user')
