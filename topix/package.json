@@ -18,10 +18,11 @@
     "joi": "^14.3.1",
     "jsonwebtoken": "^8.4.0",
     "mongoose": "^5.4.10",
+    "mongoose-friends": "^0.2.5",
     "nodemon": "^1.18.9",
     "restify": "^7.7.0",
     "restify-errors": "^6.1.1",
-    "restify-jwt": "^0.4.0",
+    "restify-jwt-community": "^1.0.9",
     "sequelize-cli": "^4.1.1",
     "validator": "^10.11.0"
   },

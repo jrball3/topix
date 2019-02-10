@@ -64,6 +64,18 @@ describe('api', function () {
               done()
             })
         })
+
+        it('should return an error if unauthorized', function (done) {
+          chai.request(url)
+            .get('/api/v1/user')
+            .send()
+            .end(function (err, res) {
+              response = res
+              if (err) throw err
+              expect(res).to.have.status(401)
+              done()
+            })
+        })
       })
 
       describe('post', function () {

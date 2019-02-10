@@ -1,25 +1,24 @@
-const rjwt = require('restify-jwt')
+const rjwt = require('restify-jwt-community')
 const jwt = require('jsonwebtoken')
 const errors = require('restify-errors')
 const UserModel = require('../../models/user')
+const resolveUser = require('../../middleware/resolve-user')
 
 class V1AuthApi {
-  constructor (exclusions) {
-    this.exclusions = exclusions || []
+  constructor (unless) {
+    this.unless = unless
   }
 
   apply (app) {
     // using restify-jwt to lock down everything except /auth
-    app.use(rjwt({ secret: process.env.JWT_SECRET }).unless({
-      path: this.exclusions
-    }))
+    app.use(rjwt({ secret: process.env.JWT_SECRET }).unless(this.unless))
+    app.use(resolveUser())
 
     app.post('/api/v1/auth', (req, res, next) => {
       const { username, password } = req.body
       UserModel
-        .find({ username })
-        .then(doc => {
-          const user = doc[0]
+        .findOne({ username })
+        .then(user => {
           if (!user) {
             res.send(new errors.UnauthorizedError('Invalid username or password.'))
             return next()

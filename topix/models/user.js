@@ -2,15 +2,18 @@ const mongoose = require('mongoose')
 const validator = require('validator')
 const timestamp = require('./plugins/timestamp')
 const Passwords = require('../utilities/passwords')
+const friends = require('mongoose-friends')
 
 const userSchema = new mongoose.Schema({
   firstName: {
     type: String,
-    required: true
+    required: true,
+    maxlength: 100
   },
   lastName: {
     type: String,
-    required: true
+    required: true,
+    maxlength: 100
   },
   email: {
     type: String,
@@ -25,18 +28,19 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     unique: true,
-    lowercase: true
+    lowercase: true,
+    minlength: 2,
+    maxlength: 30
   },
   displayName: String,
   passwordHash: {
     type: String,
     required: true
-  },
-  createdAt: Date,
-  updatedAt: Date
+  }
 })
 
 userSchema.plugin(timestamp)
+userSchema.plugin(friends())
 
 userSchema.methods.authenticate = function (password) {
   return Passwords.compare(password, this.passwordHash)

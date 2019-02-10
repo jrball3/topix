@@ -8,10 +8,12 @@ const app = restify.createServer()
 app.use(restify.plugins.queryParser())
 app.use(restify.plugins.bodyParser())
 
-const auth = new V1AuthApi([
-  /api\/v1\/auth.*/,
-  /api\/v1\/user.*/
-])
+const auth = new V1AuthApi({
+  path: [
+    /api\/v1\/auth.*/,
+    { url: /api\/v1\/user.*/, methods: ['POST'] }
+  ]
+})
 auth.apply(app)
 
 const user = new V1UserApi()

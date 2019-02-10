@@ -1,9 +1,8 @@
 const errors = require('restify-errors')
 const Joi = require('joi')
-const validator = require('../../chains/validate')
+const validator = require('../../middleware/validate')
 const UserModel = require('../../models/user')
 const passwords = require('../../utilities/passwords')
-const jwt = require('restify-jwt')
 
 class V1UserApi {
   applyPost (app) {
@@ -11,7 +10,7 @@ class V1UserApi {
       firstName: Joi.string().required(),
       lastName: Joi.string().required(),
       displayName: Joi.string(),
-      username: Joi.string().required(),
+      username: Joi.string().lowercase().required(),
       password: Joi.string().required(),
       email: Joi.string().required()
     })
@@ -56,26 +55,10 @@ class V1UserApi {
   }
 
   applyGet (app) {
-    app.get(
-      '/api/v1/user',
-      jwt({ secret: process.env.JWT_SECRET }),
-      (req, res, next) => {
-        UserModel
-          .find({ username: req.user.username })
-          .then(doc => {
-            if (!doc) {
-              res.send(new errors.BadRequestError('Invalid authorization token.'))
-            } else {
-              const user = doc[0]
-              res.send(user.toObject())
-            }
-            return next()
-          })
-          .catch(err => {
-            res.send(new errors.BadRequestError(err))
-            return next()
-          })
-      })
+    app.get('/api/v1/user', (req, res, next) => {
+      res.send(req.user)
+      return next()
+    })
   }
 
   apply (app) {
