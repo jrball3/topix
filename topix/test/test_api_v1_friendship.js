@@ -6,7 +6,7 @@ const mockUserDetails = require('./helpers').mockUserDetails
 
 const url = 'http://localhost:3000'
 
-/* global describe step before */
+/* global describe it step before */
 
 describe('api', function () {
   describe('v1', function () {
@@ -56,7 +56,7 @@ describe('api', function () {
           })
       })
 
-      step('should return an error if the user does not exist', function (done) {
+      it('should return an error if the user does not exist', function (done) {
         chai.request(url)
           .post('/api/v1/friendship')
           .set('Accept', 'application/x-www-form-urlencoded')
