@@ -4,6 +4,38 @@ const UserModel = require('../../models/user')
 const errors = require('restify-errors')
 
 class V1FriendshipApi {
+  createRequest (user, friend, res, next) {
+    UserModel.requestFriend(user._id, friend._id, function (err, doc) {
+      if (err) {
+        res.send(new errors.UnprocessableEntityError(err))
+        return next()
+      }
+      res.send(doc)
+      return next()
+    })
+  }
+
+  createIfUnique (user, friend, res, next) {
+    UserModel.friendshipBetween(user, friend, function (err, doc) {
+      if (err) {
+        res.send(new errors.InternalServerError(err))
+        return next()
+      }
+      if (doc) {
+        console.log(doc)
+        if (doc.status === 'accepted') {
+          res.send(new errors.UnprocessableEntityError('An accepted friendship with this user already exists.'))
+          return next()
+        }
+        if (doc.status === 'pending' || doc.status === 'requested') {
+          res.send(new errors.UnprocessableEntityError('A pending friendship with this user already exists.'))
+          return next()
+        }
+      }
+      return this.createRequest(user, friend, res, next)
+    }.bind(this))
+  }
+
   applyPost (app) {
     const schema = Joi.object().keys({
       username: Joi.string().lowercase().required()
@@ -18,33 +50,7 @@ class V1FriendshipApi {
             res.send(new errors.UnprocessableEntityError(`User with username "${req.body.username}" not found.`))
             return next()
           }
-
-          UserModel.friendshipBetween(req.user, friend, function (err, doc) {
-            if (err) {
-              res.send(new errors.InternalServerError(err))
-              return next()
-            }
-            if (doc) {
-              console.log(doc)
-              if (doc.status === 'accepted') {
-                res.send(new errors.UnprocessableEntityError('An accepted friendship with this user already exists.'))
-                return next()
-              }
-              if (doc.status === 'pending' || doc.status === 'requested') {
-                res.send(new errors.UnprocessableEntityError('A pending friendship with this user already exists.'))
-                return next()
-              }
-            }
-
-            UserModel.requestFriend(req.user._id, friend._id, function (err, data) {
-              if (err) {
-                res.send(new errors.UnprocessableEntityError(err))
-                return next()
-              }
-              res.send(data)
-              return next()
-            })
-          })
+          return this.createIfUnique(req.user, friend, res, next)
         })
         .catch((err) => {
           console.error(err)
