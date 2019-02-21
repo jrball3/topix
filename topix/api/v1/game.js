@@ -17,7 +17,7 @@ class V1GameApi {
       const { user } = req
       const { name, type } = req.body
       const notFound = []
-      const errors = []
+      const playerErrors = []
       const players = [user]
       const usernames = (req.body.players || [])
 
@@ -30,7 +30,7 @@ class V1GameApi {
           })
           .catch(function (err) {
             console.error(err)
-            errors.push(err)
+            playerErrors.push(err)
           })
       })).then(function () {
         const game = new GameModel({ name, type, players })
@@ -38,7 +38,7 @@ class V1GameApi {
           .then(doc => {
             res.send({
               game: doc,
-              errors: { players: { notFound, errors } }
+              errors: { players: { notFound, errors: playerErrors } }
             })
             return next()
           })
