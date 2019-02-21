@@ -4,7 +4,7 @@ const UserModel = require('../../models/user')
 const errors = require('restify-errors')
 
 class V1FriendshipApi {
-  createRequest (user, friend, res, next) {
+  _createRequest (user, friend, res, next) {
     UserModel.requestFriend(user._id, friend._id, function (err, doc) {
       if (err) {
         res.send(new errors.UnprocessableEntityError(err))
@@ -15,7 +15,7 @@ class V1FriendshipApi {
     })
   }
 
-  createIfUnique (user, friend, res, next) {
+  _createIfUnique (user, friend, res, next) {
     UserModel.friendshipBetween(user, friend, function (err, doc) {
       if (err) {
         res.send(new errors.InternalServerError(err))
@@ -36,7 +36,7 @@ class V1FriendshipApi {
           return next()
         }
       }
-      return this.createRequest(user, friend, res, next)
+      return this._createRequest(user, friend, res, next)
     }.bind(this))
   }
 
@@ -56,7 +56,7 @@ class V1FriendshipApi {
             ))
             return next()
           }
-          return this.createIfUnique(req.user, friend, res, next)
+          return this._createIfUnique(req.user, friend, res, next)
         })
         .catch((err) => {
           console.error(err)
