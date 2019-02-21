@@ -6,48 +6,53 @@ const GameType = require('../../models/game-type')
 const UserModel = require('../../models/user')
 
 class V1GameApi {
-  apply (app) {
+  applyPost (app) {
     const schema = Joi.object().keys({
       name: Joi.string().required(),
-      usernames: Joi.array().items(Joi.string()),
+      players: Joi.array().items(Joi.string()),
       type: Joi.string().valid(Object.values(GameType)).required()
     })
 
     app.post('/api/v1/game', validator(schema), (req, res, next) => {
       const { user } = req
       const { name, type } = req.body
+      const notFound = []
+      const errors = []
+      const players = [user]
+      const usernames = (req.body.players || [])
 
-      const players = []
-      const invalid = []
-      const usernames = req.body.usernames || []
-
-      usernames.forEach((un) => {
-        UserModel.findOne({ username: un }).then((doc) => {
-          if (doc) players.push(doc)
-          else invalid.push(un)
-        })
-      })
-
-      const game = new GameModel({
-        name,
-        type,
-        players: [user, ...players]
-      })
-
-      game.save()
-        .then(doc => {
-          res.send({
-            game: doc,
-            invalid
+      Promise.all(usernames.map(function (un) {
+        return UserModel.findOne({ username: un })
+          .then(function (doc) {
+            console.error(doc)
+            if (doc) players.push(doc)
+            else notFound.push(un)
           })
-          return next()
-        })
-        .catch(err => {
-          console.error(err)
-          res.send(new errors.InternalServerError(err))
-          return next()
-        })
+          .catch(function (err) {
+            console.error(err)
+            errors.push(err)
+          })
+      })).then(function () {
+        const game = new GameModel({ name, type, players })
+        game.save()
+          .then(doc => {
+            res.send({
+              game: doc,
+              errors: { players: { notFound, errors } }
+            })
+            return next()
+          })
+          .catch(err => {
+            console.error(err)
+            res.send(new errors.InternalServerError(err))
+            return next()
+          })
+      })
     })
+  }
+
+  apply (app) {
+    this.applyPost(app)
   }
 }
 

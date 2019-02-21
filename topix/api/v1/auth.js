@@ -9,7 +9,7 @@ class V1AuthApi {
     this.unless = unless
   }
 
-  apply (app) {
+  applyPost (app) {
     // using restify-jwt to lock down everything except /auth
     app.use(rjwt({ secret: process.env.JWT_SECRET }).unless(this.unless))
     app.use(resolveUser())
@@ -48,6 +48,10 @@ class V1AuthApi {
           return next()
         })
     })
+  }
+
+  apply (app) {
+    this.applyPost(app)
   }
 }
 

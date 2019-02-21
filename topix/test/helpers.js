@@ -10,8 +10,8 @@ module.exports = {
     return {
       firstName: faker.name.firstName(),
       lastName: faker.name.lastName(),
-      email: faker.internet.email(),
-      username: faker.internet.userName(),
+      email: faker.internet.email().toLowerCase(),
+      username: faker.internet.userName().toLowerCase(),
       password: faker.internet.password()
     }
   },
