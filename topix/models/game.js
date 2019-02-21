@@ -15,14 +15,8 @@ const scoreSchema = new mongoose.Schema({
   }
 })
 
-const balanceSchema = new mongoose.Schema({
-  player: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
-  },
-  // call this.markModified('balances') whenver this changes.
-  balances: {}
-})
+scoreSchema.index({ 'player._id': 1 })
+scoreSchema.index({ score: -1 })
 
 const gameSchema = new mongoose.Schema({
   name: {
@@ -48,7 +42,6 @@ const gameSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Post'
   }],
-  balances: [balanceSchema],
   scoreboard: [scoreSchema]
 })
 
@@ -62,14 +55,8 @@ const scoreFor = function (user) {
   return score
 }
 
-const balanceFor = function (user) {
-  const balance = { player: user, balances: {} }
-  return balance
-}
-
 gameSchema.post('save', function (doc) {
   doc.players.forEach((player) => {
-    doc.balances.push(balanceFor.bind(doc)(player))
     doc.scoreboard.push(scoreFor.bind(doc)(player))
   })
 })
@@ -78,6 +65,26 @@ gameSchema.methods.addPlayer = function (user) {
   if (this.status !== GameStatus.ACTIVE) {
     this.players.push(user)
     this.scoreboard.push(scoreFor.bind(this)(user))
+  }
+}
+
+gameSchema.methods.augmentPlayerScore = async function (user, augmentation) {
+  // Find score entry for player
+  try {
+    const scoreEntry = await this.scoreboard.findOne({ player: user })
+    scoreEntry.score += augmentation
+  } catch (err) {
+    console.error(err)
+    throw err
+  }
+}
+
+gameSchema.methods.getLeaderboard = function () {
+  try {
+    return this.scoreboard.sort({ score: -1 })
+  } catch (err) {
+    console.error(err)
+    throw err
   }
 }
 
