@@ -24,11 +24,15 @@ class V1FriendshipApi {
       if (doc) {
         console.log(doc)
         if (doc.status === 'accepted') {
-          res.send(new errors.UnprocessableEntityError('An accepted friendship with this user already exists.'))
+          res.send(new errors.UnprocessableEntityError(
+            'An accepted friendship with this user already exists.'
+          ))
           return next()
         }
         if (doc.status === 'pending' || doc.status === 'requested') {
-          res.send(new errors.UnprocessableEntityError('A pending friendship with this user already exists.'))
+          res.send(new errors.UnprocessableEntityError(
+            'A pending friendship with this user already exists.'
+          ))
           return next()
         }
       }
@@ -47,7 +51,9 @@ class V1FriendshipApi {
         .findOne({ username: req.body.username })
         .then((friend) => {
           if (!friend) {
-            res.send(new errors.UnprocessableEntityError(`User with username "${req.body.username}" not found.`))
+            res.send(new errors.UnprocessableEntityError(
+              `User with username "${req.body.username}" not found.`
+            ))
             return next()
           }
           return this.createIfUnique(req.user, friend, res, next)

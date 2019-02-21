@@ -20,14 +20,18 @@ class V1AuthApi {
         .findOne({ username })
         .then(user => {
           if (!user) {
-            res.send(new errors.UnauthorizedError('Invalid username or password.'))
+            res.send(new errors.UnauthorizedError(
+              'Invalid username or password.'
+            ))
             return next()
           }
           return user.authenticate(password)
         })
         .then(success => {
           if (!success) {
-            res.send(new errors.UnauthorizedError('Invalid username or password.'))
+            res.send(new errors.UnauthorizedError(
+              'Invalid username or password.'
+            ))
             return next()
           }
           // creating jsonwebtoken using the secret from config
