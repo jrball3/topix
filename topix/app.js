@@ -1,6 +1,7 @@
 const V1UserApi = require('./api/v1/user').V1UserApi
 const V1AuthApi = require('./api/v1/auth').V1AuthApi
 const V1FriendshipApi = require('./api/v1/friendship').V1FriendshipApi
+const V1GameApi = require('./api/v1/game').V1GameApi
 const restify = require('restify')
 require('./database')
 
@@ -21,5 +22,8 @@ user.apply(app)
 
 const register = new V1FriendshipApi()
 register.apply(app)
+
+const game = new V1GameApi()
+game.apply(app)
 
 module.exports = app

@@ -3,11 +3,12 @@ FROM node:11-alpine
 RUN apk --no-cache --virtual build-dependencies add python make g++
 
 COPY /topix/package.json /topix/package.json
-COPY /topix/package-lock.json /topix/package-lock.json
+COPY /topix/yarn.lock /topix/yarn.lock
 
 WORKDIR /topix/
 
-RUN npm install
+RUN npm install -g yarn
+RUN yarn install
 
 COPY /topix/ /topix/
 

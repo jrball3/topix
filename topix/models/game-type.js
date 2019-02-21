@@ -1,3 +1,3 @@
 module.exports = {
-  karmaHole: 'karmaHole'
+  KARMA_HOLE: 'KARMA_HOLE'
 }

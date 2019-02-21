@@ -3,7 +3,7 @@ const expect = chai.expect
 const chaiHttp = require('chai-http')
 chai.use(chaiHttp)
 const util = require('util')
-const mockUserDetails = require('./helpers').mockUserDetails
+const { mockUserDetails, registerUser, authUser } = require('./helpers')
 
 const url = 'http://localhost:3000'
 
@@ -19,16 +19,14 @@ describe('api', function () {
         const user = mockUserDetails()
 
         before(function (done) {
-          chai
-            .request(url)
-            .post('/api/v1/user')
-            .set('Accept', 'application/x-www-form-urlencoded')
-            .send(user)
-            .end(function (err, res) {
-              if (err) throw err
-              expect(res).to.have.status(200)
+          registerUser(user, function (res) {
+            response = res
+            authUser(user, function (res) {
+              response = res
+              token = res.body.token
               done()
             })
+          })
         })
 
         before(function (done) {
