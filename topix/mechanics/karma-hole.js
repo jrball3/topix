@@ -13,9 +13,9 @@ const KarmaHole = (game) => ({
       game,
       message,
     })
-    return post.save()
+    await post.save()
       .then(() => game.augmentPlayerScore(user, POST_COST))
-      .then(() => post)
+    return post
   },
 
   upvotePost: async function (user, post) {
