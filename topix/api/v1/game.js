@@ -24,7 +24,6 @@ class V1GameApi {
       Promise.all(usernames.map(function (un) {
         return UserModel.findOne({ username: un })
           .then(function (doc) {
-            console.error(doc)
             if (doc) players.push(doc)
             else notFound.push(un)
           })
