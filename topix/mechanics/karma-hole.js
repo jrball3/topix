@@ -1,4 +1,4 @@
-const PostModel = require('../../models/post')
+const PostModel = require('../models/post')
 
 const POST_COST = -5
 const DOWNVOTE_COST = -5

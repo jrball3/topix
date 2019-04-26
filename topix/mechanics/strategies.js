@@ -1,4 +1,4 @@
-const GameType = require('../../models/game-type')
+const GameType = require('../models/game-type')
 const KarmaHole = require('./karma-hole')
 
 const StrategyFactory = {
