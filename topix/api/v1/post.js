@@ -3,29 +3,29 @@ const validator = require('../../middleware/validate')
 const Joi = require('joi')
 const GameModel = require('../../models/game')
 const StrategyFactory = require('../../mechanics/strategies')
+const mongoose = require('mongoose')
 
 class V1PostApi {
   applyPost (app) {
     const schema = Joi.object().keys({
-      gameId: Joi.number().required(),
+      gameId: Joi.string().required(),
       message: Joi.string().required(),
     })
 
     app.post('/api/v1/post', validator(schema), (req, res, next) => {
       const { user } = req
       const { gameId, message } = req.body
-
-      const game = GameModel.findOne({ id: gameId })
-        .then(function(doc) {
-          if (!doc) {
-            res.send(new errors.ResourceNotFoundError('Game not found'))
+      GameModel.findById(gameId)
+        .then(function(game) {
+          if (!game) {
+            res.send(new errors.ResourceNotFoundError(`Game ${gameId} not found`))
             return next()
           }
           StrategyFactory
             .strategyFor(game)
             .createPost(user, message)
-            .then(doc => {
-              res.send(doc)
+            .then(post => {
+              res.send(post)
               return next()
             })
             .catch(err => {
@@ -43,7 +43,7 @@ class V1PostApi {
 
   applyUpvote (app) {
     const schema = Joi.object().keys({
-      gameId: Joi.number().required(),
+      gameId: Joi.string().required(),
       message: Joi.string().required(),
     })
 
@@ -51,8 +51,8 @@ class V1PostApi {
       const { user } = req
       const { gameId, postId } = req.body
       Promise.all([
-        GameModel.findOne({ id: gameId }),
-        PostModel.findOne({ id: postId })
+        GameModel.findById(gameId),
+        PostModel.findById(postId)
       ])
       .then(function([game, post]) {
         if (!game) {
@@ -67,8 +67,8 @@ class V1PostApi {
           .strategyFor(game)
           .upvotePost(user, post)
       })
-      .then(game => {
-        res.send(game)
+      .then(() => {
+        res.send(post)
         return next()
       })
       .catch((err) => {
@@ -81,7 +81,7 @@ class V1PostApi {
 
   applyDownvote (app) {
     const schema = Joi.object().keys({
-      gameId: Joi.number().required(),
+      gameId: Joi.string().required(),
       message: Joi.string().required(),
     })
 
@@ -105,8 +105,8 @@ class V1PostApi {
           .strategyFor(game)
           .downvotePost(user, post)
       })
-      .then(game => {
-        res.send(game)
+      .then(() => {
+        res.send(post)
         return next()
       })
       .catch((err) => {

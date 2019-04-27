@@ -19,19 +19,21 @@ describe('api', function () {
       let user1Token
 
       before(function (done) {
-        registerUser(user1, function (res) {
+        registerUser(user1)
+        .then(function(res, err) {
           response = res
-          authUser(user1, function (res) {
-            response = res
-            user1Token = res.body.token
-            done()
-          })
+          if (err) throw err
+          return authUser(user1)
         })
-      })
-
-      before(function (done) {
-        registerUser(user2, function (res) {
+        .then(function (res, err) {
           response = res
+          user1Token = res.body.token
+          if (err) throw err
+          return registerUser(user2)
+        })
+        .then(function(res, err) {
+          response = res
+          if (err) throw err
           done()
         })
       })

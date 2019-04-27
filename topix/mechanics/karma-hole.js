@@ -14,7 +14,9 @@ const KarmaHole = (game) => ({
       message,
     })
     await post.save()
-      .then(() => game.augmentPlayerScore(user, POST_COST))
+    await game.augmentPlayerScore(user, POST_COST)
+    await game.scoreboard.save()
+    await game.save()
     return post
   },
 
@@ -23,6 +25,8 @@ const KarmaHole = (game) => ({
       game.augmentPlayerScore(user, UPVOTE_COST),
       game.augmentPlayerScore(post.user, UPVOTE_AWARD)
     ]);
+    await game.scoreboard.save()
+    await game.save()
     return game;
   },
 
@@ -31,6 +35,8 @@ const KarmaHole = (game) => ({
       game.augmentPlayerScore(user, DOWNVOTE_COST),
       game.augmentPlayerScore(post.user, DOWNVOTE_AWARD)
     ]);
+    await game.scoreboard.save()
+    await game.save()
     return game;
   },
 })

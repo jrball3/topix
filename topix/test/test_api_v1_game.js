@@ -13,25 +13,27 @@ const url = 'http://localhost:3000'
 
 describe('api', function () {
   describe('v1', function () {
-    describe('auth', function () {
+    describe('game', function () {
       const user = mockUserDetails()
       const friend = mockUserDetails()
       let response, token
 
       before(function (done) {
-        registerUser(user, function (res) {
+        registerUser(user)
+        .then(function(res, err) {
           response = res
-          authUser(user, function (res) {
-            response = res
-            token = res.body.token
-            done()
-          })
+          if (err) throw err
+          return authUser(user)
         })
-      })
-
-      before(function (done) {
-        registerUser(friend, function (res) {
+        .then(function (res, err) {
           response = res
+          token = res.body.token
+          if (err) throw err
+          return registerUser(friend)
+        })
+        .then(function (res, err) {
+          response = res
+          if (err) throw err
           done()
         })
       })

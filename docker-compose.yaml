@@ -1,6 +1,6 @@
 version: '3'
 services:
-  user_api:
+  api:
     build: .
     command: sh -c "/wait && npm start"
     ports:

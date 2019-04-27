@@ -16,8 +16,10 @@ describe('api', function () {
       let response
 
       before(function (done) {
-        registerUser(user, function (res) {
+        registerUser(user)
+        .then(function(res, err) {
           response = res
+          if (err) throw err
           done()
         })
       })

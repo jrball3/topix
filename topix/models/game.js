@@ -15,6 +15,12 @@ const scoreSchema = new mongoose.Schema({
   }
 })
 
+scoreSchema.set('toJSON', {
+  virtuals: true,
+  versionKey:false,
+  transform: function (doc, ret) {   delete ret._id  }
+});
+
 scoreSchema.index({ 'player._id': 1 })
 scoreSchema.index({ score: -1 })
 
@@ -44,6 +50,12 @@ const gameSchema = new mongoose.Schema({
   }],
   scoreboard: [scoreSchema]
 })
+
+gameSchema.set('toJSON', {
+  virtuals: true,
+  versionKey:false,
+  transform: function (doc, ret) {   delete ret._id  }
+});
 
 gameSchema.plugin(timestamp)
 

@@ -19,13 +19,17 @@ describe('api', function () {
         const user = mockUserDetails()
 
         before(function (done) {
-          registerUser(user, function (res) {
+          registerUser(user)
+          .then(function(res, err) {
             response = res
-            authUser(user, function (res) {
-              response = res
-              token = res.body.token
-              done()
-            })
+            if (err) throw err
+            return authUser(user)
+          })
+          .then(function (res, err) {
+            response = res
+            token = res.body.token
+            if (err) throw err
+            done()
           })
         })
 
