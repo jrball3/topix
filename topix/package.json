@@ -1,11 +1,12 @@
 {
-  "name": "Topix",
+  "name": "topix",
   "version": "1.0.0",
   "description": "",
   "main": "app.js",
   "scripts": {
     "test": "mocha --require mocha-steps",
-    "start": "nodemon main.js --exec babel-node --"
+    "start": "nodemon main.js --exec babel-node --",
+    "debug": "nodemon main.js --inspect --exec babel-node --"
   },
   "author": "",
   "license": "ISC",

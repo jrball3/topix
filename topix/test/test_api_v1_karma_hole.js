@@ -21,7 +21,7 @@ const url = 'http://localhost:3000'
 
 describe('api', function () {
   describe('v1', function () {
-    describe('post', function () {
+    describe('karma hole', function () {
       let response, token, game
       const user = mockUserDetails()
       const players = [
@@ -44,7 +44,7 @@ describe('api', function () {
           if (err) throw err
           return Promise.all(players.map(player => registerUser(player)));
         })
-        .then(function(res, err) {
+        .then(function (res, err) {
           response = res
           if (err) throw err
           done()
@@ -52,26 +52,32 @@ describe('api', function () {
       })
 
       before(function (done) {
+        this.timeout(50000000)
         createGame(
           token,
           'testGame',
           GameType.KARMA_HOLE,
           players,
         )
-        .then(function (res, err) {
+        .end(function (err, res) {
           response = res
-          game = res.body.game
           if (err) throw err
+          game = res.body.game
           done()
         })
       })
 
-      it('should create a post', function (done) {
+      it('should properly handle a post', function (done) {
         createPost(token, game, 'this is my message')
           .end(function (err, res) {
             response = res
             if (err) throw err
             expect(res).to.have.status(200)
+            expect(res.body).to.have.property('upvotes')
+            expect(res.body).to.have.property('downvotes')
+            expect(res.body.message).to.be.equal('this is my message')
+            expect(res.body.game.players.length).to.be.equal(4)
+            console.log(res.body)
             done()
           })
       })

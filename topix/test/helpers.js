@@ -35,13 +35,24 @@ module.exports = {
 
   createGame: (token, gameName, gameType, players) => (
     chai.request(url)
-    .post('/api/v1/game')
+      .post('/api/v1/game')
+      .set('Accept', 'application/x-www-form-urlencoded')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        name: gameName,
+        type: gameType,
+        players: players.map(p => p.username),
+      })
+  ),
+
+  createPost: (token, game, message) => (
+    chai.request(url)
+    .post('/api/v1/post')
     .set('Accept', 'application/x-www-form-urlencoded')
     .set('Authorization', `Bearer ${token}`)
     .send({
-      name: gameName,
-      type: gameType,
-      players: players.map(p => p.username),
+      gameId: game.id,
+      message,
     })
   )
 }

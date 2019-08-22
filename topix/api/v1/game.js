@@ -1,9 +1,10 @@
 const errors = require('restify-errors')
 const validator = require('../../middleware/validate')
 const Joi = require('joi')
-const GameModel = require('../../models/game')
 const GameType = require('../../models/game-type')
 const UserModel = require('../../models/user')
+const GameModel = require('../../models/game')
+const GameFactory = require('../../factories/game')
 
 class V1GameApi {
   applyPost (app) {
@@ -13,7 +14,7 @@ class V1GameApi {
       type: Joi.string().valid(Object.values(GameType)).required()
     })
 
-    app.post('/api/v1/game', validator(schema), (req, res, next) => {
+    app.post('/api/v1/game', validator(schema), async (req, res, next) => {
       const { user } = req
       const { name, type } = req.body
       const notFound = []
@@ -21,7 +22,7 @@ class V1GameApi {
       const players = [user]
       const usernames = (req.body.players || [])
 
-      Promise.all(usernames.map(function (un) {
+      await Promise.all(usernames.map(function (un) {
         return UserModel.findOne({ username: un })
           .then(function (doc) {
             if (doc) players.push(doc)
@@ -31,23 +32,24 @@ class V1GameApi {
             console.error(err)
             playerErrors.push(err)
           })
-      })).then(function () {
-        const game = new GameModel({ name, type, players })
-        game.save()
-          .then(doc => {
-            res.send({
-              game: doc,
-              errors: { players: { notFound, errors: playerErrors } }
-            })
-            return next()
-          })
-          .catch(err => {
-            console.error(err)
-            res.send(new errors.InternalServerError(err))
-            return next()
-          })
-      })
+      }))
+
+      try {
+        const { game, scores } = await GameFactory.gameFor(name, type, players)
+        game.scores.push(...scores)
+        await game.save()
+        res.send({
+          game: await GameModel.findOne({'_id': game._id}),
+          errors: { players: { notFound, errors: playerErrors } }
+        })
+      } catch (err) {
+        console.error(err)
+        res.send(new errors.InternalServerError(err))
+      }
+
+      return next()
     })
+
   }
 
   apply (app) {

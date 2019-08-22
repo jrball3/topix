@@ -12,32 +12,26 @@ class V1PostApi {
       message: Joi.string().required(),
     })
 
-    app.post('/api/v1/post', validator(schema), (req, res, next) => {
+    app.post('/api/v1/post', validator(schema), async (req, res, next) => {
       const { user } = req
       const { gameId, message } = req.body
-      GameModel.findById(gameId)
-        .then(function(game) {
-          if (!game) {
-            res.send(new errors.ResourceNotFoundError(`Game ${gameId} not found`))
-            return next()
-          }
-          StrategyFactory
-            .strategyFor(game)
-            .createPost(user, message)
-            .then(post => {
-              res.send(post)
-              return next()
-            })
-            .catch(err => {
-              res.send(errors.InternalServerError(err))
-              return next()
-            })
-      })
-      .catch(err => {
-        console.error(err)
-        res.send(new errors.InternalServerError(err))
+      const game = await GameModel.findById(gameId)
+      if (!game) {
+        res.send(new errors.ResourceNotFoundError(`Game ${gameId} not found`))
         return next()
-      })
+      }
+      try {
+        const post = await StrategyFactory
+          .strategyFor(game)
+          .createPost(user, message)
+        const savedPost = await post.save()
+        res.send(savedPost)
+      }
+      catch (err) {
+        console.error(err)
+        res.send(new errors.InternalServerError(err)) 
+      }
+      return next()
     })
   }
 

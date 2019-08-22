@@ -3,7 +3,12 @@ const expect = chai.expect
 const chaiHttp = require('chai-http')
 chai.use(chaiHttp)
 const util = require('util')
-const { mockUserDetails, registerUser, authUser } = require('./helpers')
+const { 
+  mockUserDetails,
+  registerUser,
+  authUser,
+  createGame,
+} = require('./helpers')
 const GameType = require('../models/game-type')
 const GameStatus = require('../models/game-status')
 
@@ -27,8 +32,8 @@ describe('api', function () {
         })
         .then(function (res, err) {
           response = res
-          token = res.body.token
           if (err) throw err
+          token = res.body.token
           return registerUser(friend)
         })
         .then(function (res, err) {
@@ -39,14 +44,7 @@ describe('api', function () {
       })
 
       it('should create a game with no players', function (done) {
-        chai.request(url)
-          .post('/api/v1/game')
-          .set('Accept', 'application/x-www-form-urlencoded')
-          .set('Authorization', `Bearer ${token}`)
-          .send({
-            name: 'testGame',
-            type: GameType.KARMA_HOLE
-          })
+        createGame(token, 'testGame', GameType.KARMA_HOLE, [])
           .end(function (err, res) {
             response = res
             if (err) throw err
@@ -67,15 +65,7 @@ describe('api', function () {
       })
 
       it('should create a game with players', function (done) {
-        chai.request(url)
-          .post('/api/v1/game')
-          .set('Accept', 'application/x-www-form-urlencoded')
-          .set('Authorization', `Bearer ${token}`)
-          .send({
-            name: 'testGame',
-            type: GameType.KARMA_HOLE,
-            players: [friend.username]
-          })
+        createGame(token, 'testGame', GameType.KARMA_HOLE, [friend])
           .end(function (err, res) {
             response = res
             if (err) throw err
