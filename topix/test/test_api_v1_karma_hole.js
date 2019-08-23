@@ -70,7 +70,7 @@ describe('api', function () {
 
       it('should properly handle a post', function (done) {
         this.timeout(5000)
-        createPost(token, game, 'this is my message')
+        createPost(token, game.id, 'this is my message')
           .then(function (res, err) {
             response = res
             if (err) throw err

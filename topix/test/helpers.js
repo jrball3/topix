@@ -45,13 +45,13 @@ module.exports = {
       })
   ),
 
-  createPost: (token, game, message) => (
+  createPost: (token, gameId, message) => (
     chai.request(url)
       .post('/api/v1/post')
       .set('Accept', 'application/x-www-form-urlencoded')
       .set('Authorization', `Bearer ${token}`)
       .send({
-        gameId: game.id,
+        gameId,
         message,
       })
   ),

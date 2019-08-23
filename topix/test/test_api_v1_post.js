@@ -9,6 +9,7 @@ const {
   authUser,
   createGame,
   createPost,
+  fetchPost,
 } = require('./helpers')
 
 
@@ -30,50 +31,37 @@ describe('api', function () {
         mockUserDetails(),
       ]
 
-      before(function (done) {
+      before(async function () {
         this.timeout(5000)
-        registerUser(user)
-        .then(function(res, err) {
-          response = res
-          if (err) throw err
-          return authUser(user)
-        })
-        .then(function (res, err) {
-          response = res
-          token = res.body.token
-          if (err) throw err
-          return Promise.all(players.map(player => registerUser(player)));
-        })
-        .then(function(res, err) {
-          response = res
-          if (err) throw err
-          done()
-        })
+        await registerUser(user)
+        const auth = await authUser(user)
+        token = auth.body.token
+        await Promise.all(players.map(player => registerUser(player)))
       })
 
-      before(function (done) {
-        createGame(
+      before(async function () {
+        const res = await createGame(
           token,
           'testGame',
           GameType.KARMA_HOLE,
           players,
         )
-        .then(function (res, err) {
-          response = res
-          game = res.body.game
-          if (err) throw err
-          done()
-        })
+        game = res.body.game
       })
 
-      it('should create a post', function (done) {
-        createPost(token, game, 'this is my message')
-          .end(function (err, res) {
-            response = res
-            if (err) throw err
-            expect(res).to.have.status(200)
-            done()
-          })
+      it('should create a post', async function () {
+        const res = await createPost(token, game.id, 'this is my message')
+        response = res
+        expect(res).to.have.status(200)
+      })
+
+      it('should fetch a post', async function () {
+        await createPost(token, game.id, 'this is my message')
+        const res = await fetchPost(token, game.id)
+        response = res
+        expect(res).to.have.status(200)
+        expect(res.body).to.have.property('posts')
+        expect(res.body.posts.length).to.be.greaterThan(0)
       })
 
       afterEach(function () {
