@@ -60,6 +60,15 @@ class V1GameApi {
         const retGame = await GameModel
           .findById(game._id)
           .populate('players')
+          .populate('posts')
+          .populate({
+            path: 'posts',
+            populate: { path: 'upvotes' }
+          })
+          .populate({
+            path: 'posts',
+            populate: { path: 'downvotes' }
+          })
           .populate({
             path: 'scores',
             // Get friends of friends - populate the 'friends' array for every friend

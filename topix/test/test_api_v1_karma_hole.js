@@ -24,48 +24,31 @@ describe('api', function () {
   describe('v1', function () {
     describe('karma hole', function () {
       let response, token, game
-      const user = mockUserDetails()
+      let user = mockUserDetails()
       const players = [
         mockUserDetails(), 
         mockUserDetails(),
         mockUserDetails(),
       ]
 
-      before(function (done) {
+      before(async function () {
         this.timeout(5000)
-        registerUser(user)
-        .then(function(res, err) {
-          response = res
-          if (err) throw err
-          return authUser(user)
-        })
-        .then(function (res, err) {
-          response = res
-          token = res.body.token
-          if (err) throw err
-          return Promise.all(players.map(player => registerUser(player)));
-        })
-        .then(function (res, err) {
-          response = res
-          if (err) throw err
-          done()
-        })
+        const regUser = await registerUser(user)
+        user.id = regUser.body.id
+        const auth = await authUser(user)
+        token = auth.body.token
+        await Promise.all(players.map(player => registerUser(player)))
       })
 
-      before(function (done) {
+      before(async function () {
         this.timeout(5000)
-        createGame(
+        const res = await createGame(
           token,
           'testGame',
           GameType.KARMA_HOLE,
           players,
         )
-        .end(function (err, res) {
-          response = res
-          if (err) throw err
-          game = res.body.game
-          done()
-        })
+        game = res.body.game
       })
 
       it('should properly handle a post', function (done) {
@@ -90,6 +73,36 @@ describe('api', function () {
             expect(res.body.score.filter(s => s.player.username === user.username)[0].score).to.be.equal(45)
             done()
           })
+      })
+
+      it('should properly handle an upvote', async function () {
+        this.timeout(5000)
+        const postRes = await createPost(token, game.id, 'this is my message')
+        const postId = postRes.body.id
+        const res = await chai.request(url)
+          .post('/api/v1/upvote')
+          .set('Accept', 'application/x-www-form-urlencoded')
+          .set('Authorization', `Bearer ${token}`)
+          .send({ postId })
+        response = res
+        expect(res).to.have.status(200)
+        expect(res.body.upvote.post).to.be.equal(postId)
+        expect(res.body.upvote.user).to.be.equal(user.id)
+      })
+
+      it('should properly handle an downvote', async function () {
+        this.timeout(5000)
+        const postRes = await createPost(token, game.id, 'this is my message')
+        const postId = postRes.body.id
+        const res = await chai.request(url)
+          .post('/api/v1/downvote')
+          .set('Accept', 'application/x-www-form-urlencoded')
+          .set('Authorization', `Bearer ${token}`)
+          .send({ postId })
+        response = res
+        expect(res).to.have.status(200)
+        expect(res.body.downvote.post).to.be.equal(postId)
+        expect(res.body.downvote.user).to.be.equal(user.id)
       })
 
       afterEach(function () {

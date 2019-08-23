@@ -4,7 +4,6 @@ const Joi = require('joi')
 const GameModel = require('../../models/game')
 const PostModel = require('../../models/post')
 const StrategyFactory = require('../../mechanics/strategies')
-const mongoose = require('mongoose')
 
 class V1PostApi {
   applyGet (app) {
@@ -62,32 +61,24 @@ class V1PostApi {
 
   applyUpvote (app) {
     const schema = Joi.object().keys({
-      gameId: Joi.string().required(),
-      message: Joi.string().required(),
+      postId: Joi.string().required(),
     })
 
     app.post('/api/v1/upvote', validator(schema), async (req, res, next) => {
       const { user } = req
-      const { gameId, postId } = req.body
+      const { postId } = req.body
       try {
-        const [game, post] = await Promise.all([
-          GameModel.findById(gameId),
-          PostModel.findById(postId)
-        ])
-        if (!game) {
-          res.send(new errors.ResourceNotFoundError(`Game ${gameId} not found!`))
-          return next()
-        }
+        const post = await PostModel.findById(postId).populate('game')
         if (!post) {
           res.send(new errors.ResourceNotFoundError(`Post ${postId} not found!`))
           return next()
         }
 
-        await StrategyFactory
-          .strategyFor(game)
+        const upvote = await StrategyFactory
+          .strategyFor(post.game)
           .upvotePost(user, post)
 
-        res.send(post)
+        res.send({ upvote })
         return next()
       }
       catch (err) {
@@ -100,32 +91,24 @@ class V1PostApi {
 
   applyDownvote (app) {
     const schema = Joi.object().keys({
-      gameId: Joi.string().required(),
-      message: Joi.string().required(),
+      postId: Joi.string().required(),
     })
 
     app.post('/api/v1/downvote', validator(schema), async (req, res, next) => {
       const { user } = req
-      const { gameId, postId } = req.body
+      const { postId } = req.body
       try {
-        const [game, post] = await Promise.all([
-          GameModel.findById(gameId),
-          PostModel.findById(postId)
-        ])
-        if (!game) {
-          res.send(new errors.ResourceNotFoundError(`Game ${gameId} not found!`))
-          return next()
-        }
+        const post = await PostModel.findById(postId).populate('game')
         if (!post) {
           res.send(new errors.ResourceNotFoundError(`Post ${postId} not found!`))
           return next()
         }
 
-        await StrategyFactory
-          .strategyFor(game)
+        const downvote = await StrategyFactory
+          .strategyFor(post.game)
           .downvotePost(user, post)
 
-        res.send(post)
+        res.send({ downvote })
         return next()
       }
       catch (err) {

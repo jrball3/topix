@@ -3,6 +3,8 @@ const jwt = require('jsonwebtoken')
 const errors = require('restify-errors')
 const UserModel = require('../../models/user')
 const resolveUser = require('../../middleware/resolve-user')
+const validator = require('../../middleware/validate')
+const Joi = require('joi')
 
 class V1AuthApi {
   constructor (unless) {
@@ -14,7 +16,12 @@ class V1AuthApi {
     app.use(rjwt({ secret: process.env.JWT_SECRET }).unless(this.unless))
     app.use(resolveUser())
 
-    app.post('/api/v1/auth', async (req, res, next) => {
+    const schema = Joi.object().keys({
+      username: Joi.string().required(),
+      password: Joi.string().required(),
+    })
+
+    app.post('/api/v1/auth', validator(schema), async (req, res, next) => {
       const { username, password } = req.body
       const user = await UserModel.findOne({ username })
       if (!user) {

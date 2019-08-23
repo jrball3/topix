@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 const timestamp = require('./plugins/timestamp')
 
 const postSchema = new mongoose.Schema({
-  user: {
+  author: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true
@@ -12,14 +12,14 @@ const postSchema = new mongoose.Schema({
     ref: 'Game',
     required: true
   },
-  upvotes: {
-    type: Number,
-    default: 0
-  },
-  downvotes: {
-    type: Number,
-    default: 0
-  },
+  upvotes: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Upvote',
+  }],
+  downvotes: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Downvote',
+  }],
   message: {
     type: String,
     required: true
