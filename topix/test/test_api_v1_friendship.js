@@ -18,24 +18,12 @@ describe('api', function () {
       const user2 = mockUserDetails()
       let user1Token
 
-      before(function (done) {
-        registerUser(user1)
-        .then(function(res, err) {
-          response = res
-          if (err) throw err
-          return authUser(user1)
-        })
-        .then(function (res, err) {
-          response = res
-          user1Token = res.body.token
-          if (err) throw err
-          return registerUser(user2)
-        })
-        .then(function(res, err) {
-          response = res
-          if (err) throw err
-          done()
-        })
+      before(async function () {
+        this.timeout(5000)
+        await registerUser(user1)
+        const auth = await authUser(user1)
+        user1Token = auth.body.token
+        await registerUser(user2)
       })
 
       it('should return an error if the user does not exist', function (done) {

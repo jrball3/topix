@@ -15,13 +15,9 @@ describe('api', function () {
       const user = mockUserDetails()
       let response
 
-      before(function (done) {
-        registerUser(user)
-        .then(function(res, err) {
-          response = res
-          if (err) throw err
-          done()
-        })
+      before(async function () {
+        this.timeout(5000)
+        await registerUser(user)
       })
 
       it('should not auth with the wrong password', function (done) {

@@ -18,36 +18,11 @@ describe('api', function () {
         let token
         const user = mockUserDetails()
 
-        before(function (done) {
-          registerUser(user)
-          .then(function(res, err) {
-            response = res
-            if (err) throw err
-            return authUser(user)
-          })
-          .then(function (res, err) {
-            response = res
-            token = res.body.token
-            if (err) throw err
-            done()
-          })
-        })
-
-        before(function (done) {
-          chai.request(url)
-            .post('/api/v1/auth')
-            .set('Accept', 'application/x-www-form-urlencoded')
-            .send({
-              username: user.username,
-              password: user.password
-            })
-            .end(function (err, res) {
-              if (err) throw err
-              expect(res).to.have.status(200)
-              expect(res.body.token).to.not.equal(null)
-              token = res.body.token
-              done()
-            })
+        before(async function () {
+          this.timeout(5000)
+          await registerUser(user)
+          const auth = await authUser(user)
+          token = auth.body.token
         })
 
         it('should properly return the user data', function (done) {

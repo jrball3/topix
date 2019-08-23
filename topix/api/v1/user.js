@@ -12,10 +12,10 @@ class V1UserApi {
       displayName: Joi.string(),
       username: Joi.string().lowercase().required(),
       password: Joi.string().required(),
-      email: Joi.string().required()
+      email: Joi.string().email().required()
     })
 
-    app.post('/api/v1/user', validator(schema), (req, res, next) => {
+    app.post('/api/v1/user', validator(schema), async (req, res, next) => {
       const {
         firstName,
         lastName,
@@ -24,33 +24,33 @@ class V1UserApi {
         email,
         password
       } = req.body
-      passwords
-        .hash(password)
-        .then(hashedPassword => {
-          return new UserModel({
-            firstName,
-            lastName,
-            username,
-            displayName,
-            email,
-            passwordHash: hashedPassword
-          })
+
+      let user, savedUser
+      try {
+        const hashedPassword = await passwords.hash(password)
+        user = new UserModel({
+          firstName,
+          lastName,
+          username,
+          displayName,
+          email,
+          passwordHash: hashedPassword
         })
-        .catch(err => {
-          console.error(err)
-          res.send(new errors.InternalServerError(err))
-          return next()
-        })
-        .then(userModel => userModel.save())
-        .then(doc => {
-          res.send(doc)
-          return next()
-        })
-        .catch(err => {
-          console.error(err)
-          res.send(new errors.BadRequestError(err))
-          return next()
-        })
+      } catch (err) {
+        console.log(err)
+        res.send(new errors.InternalServerError(err))
+        return next()
+      }
+
+      try {
+        savedUser = await user.save()
+      } catch (err) {
+        console.log(err)
+        res.send(new errors.UnprocessableEntityError(err))
+        return next()
+      }
+
+      res.send(savedUser)
     })
   }
 

@@ -23,24 +23,12 @@ describe('api', function () {
       const friend = mockUserDetails()
       let response, token
 
-      before(function (done) {
-        registerUser(user)
-        .then(function(res, err) {
-          response = res
-          if (err) throw err
-          return authUser(user)
-        })
-        .then(function (res, err) {
-          response = res
-          if (err) throw err
-          token = res.body.token
-          return registerUser(friend)
-        })
-        .then(function (res, err) {
-          response = res
-          if (err) throw err
-          done()
-        })
+      before(async function () {
+        this.timeout(5000)
+        await registerUser(user)
+        const auth = await authUser(user)
+        token = auth.body.token
+        await registerUser(friend)
       })
 
       it('should create a game with no players', function (done) {

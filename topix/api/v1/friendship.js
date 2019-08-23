@@ -45,24 +45,23 @@ class V1FriendshipApi {
       username: Joi.string().lowercase().required()
     })
 
-    app.post('/api/v1/friendship', validator(schema), (req, res, next) => {
+    app.post('/api/v1/friendship', validator(schema), async (req, res, next) => {
       console.log(`friendship post with body: ${JSON.stringify(req.body)}`)
-      UserModel
-        .findOne({ username: req.body.username })
-        .then((friend) => {
-          if (!friend) {
-            res.send(new errors.UnprocessableEntityError(
-              `User with username "${req.body.username}" not found.`
-            ))
-            return next()
-          }
-          return this._createIfUnique(req.user, friend, res, next)
-        })
-        .catch((err) => {
-          console.error(err)
-          res.send(new errors.InternalServerError(err))
+      try {
+        const friend = await UserModel.findOne({ username: req.body.username })
+        if (!friend) {
+          res.send(new errors.UnprocessableEntityError(
+            `User with username "${req.body.username}" not found.`
+          ))
           return next()
-        })
+        }
+        return this._createIfUnique(req.user, friend, res, next)
+      }
+      catch (err) {
+        console.error(err)
+        res.send(new errors.InternalServerError(err))
+        return next()
+      }
     })
   }
 
