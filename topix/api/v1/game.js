@@ -7,6 +7,24 @@ const GameModel = require('../../models/game')
 const GameFactory = require('../../factories/game')
 
 class V1GameApi {
+
+  applyGet (app) {
+    const schema = Joi.object().keys({
+      gameId: Joi.string().required(),
+    })
+
+    app.get('/api/v1/game', validator(schema), async (req, res, next) => {
+      const { gameId } = req.body
+      try {
+        const game = await GameModel.findById(gameId)
+        res.send({ game })
+      } catch (err) {
+        res.send(errors.InternalServerError(err))
+      }
+      return next()
+    })
+  }
+
   applyPost (app) {
     const schema = Joi.object().keys({
       name: Joi.string().required(),
@@ -36,10 +54,20 @@ class V1GameApi {
 
       try {
         const { game, scores } = await GameFactory.gameFor(name, type, players)
+        await Promise.all(scores.map(s => s.save()))
         game.scores.push(...scores)
         await game.save()
+        const retGame = await GameModel
+          .findById(game._id)
+          .populate('players')
+          .populate({
+            path: 'scores',
+            // Get friends of friends - populate the 'friends' array for every friend
+            populate: { path: 'player' }
+          });
+
         res.send({
-          game: await GameModel.findOne({'_id': game._id}),
+          game: retGame,
           errors: { players: { notFound, errors: playerErrors } }
         })
       } catch (err) {
@@ -53,6 +81,7 @@ class V1GameApi {
   }
 
   apply (app) {
+    this.applyGet(app)
     this.applyPost(app)
   }
 }

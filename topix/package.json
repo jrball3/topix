@@ -6,7 +6,8 @@
   "scripts": {
     "test": "mocha --require mocha-steps",
     "start": "nodemon main.js --exec babel-node --",
-    "debug": "nodemon main.js --inspect --exec babel-node --"
+    "debug": "nodemon main.js --inspect=9229 --exec babel-node --",
+    "debug-test": "mocha --require mocha-steps --inspect=9230"
   },
   "author": "",
   "license": "ISC",

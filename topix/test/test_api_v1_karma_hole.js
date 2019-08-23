@@ -9,11 +9,12 @@ const {
   authUser,
   createGame,
   createPost,
+  fetchGame,
+  fetchScore,
 } = require('./helpers')
 
 
 const GameType = require('../models/game-type')
-const GameStatus = require('../models/game-status')
 
 const url = 'http://localhost:3000'
 
@@ -52,7 +53,7 @@ describe('api', function () {
       })
 
       before(function (done) {
-        this.timeout(50000000)
+        this.timeout(5000)
         createGame(
           token,
           'testGame',
@@ -68,16 +69,25 @@ describe('api', function () {
       })
 
       it('should properly handle a post', function (done) {
+        this.timeout(5000)
         createPost(token, game, 'this is my message')
-          .end(function (err, res) {
+          .then(function (res, err) {
             response = res
             if (err) throw err
+
             expect(res).to.have.status(200)
             expect(res.body).to.have.property('upvotes')
             expect(res.body).to.have.property('downvotes')
             expect(res.body.message).to.be.equal('this is my message')
             expect(res.body.game.players.length).to.be.equal(4)
-            console.log(res.body)
+
+            return fetchScore(token, game.id)
+          })
+          .then(function (res, err) {
+            response = res
+            if (err) throw err
+            expect(res).to.have.status(200)
+            expect(res.body.score.filter(s => s.player.username === user.username)[0].score).to.be.equal(45)
             done()
           })
       })

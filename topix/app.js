@@ -3,6 +3,7 @@ const V1AuthApi = require('./api/v1/auth').V1AuthApi
 const V1FriendshipApi = require('./api/v1/friendship').V1FriendshipApi
 const V1GameApi = require('./api/v1/game').V1GameApi
 const V1PostApi = require('./api/v1/post').V1PostApi
+const V1ScoreApi = require('./api/v1/score').V1ScoreApi
 const restify = require('restify')
 require('./database')
 
@@ -29,5 +30,8 @@ game.apply(app)
 
 const post = new V1PostApi()
 post.apply(app)
+
+const score = new V1ScoreApi()
+score.apply(app)
 
 module.exports = app

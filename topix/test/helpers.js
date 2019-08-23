@@ -47,12 +47,36 @@ module.exports = {
 
   createPost: (token, game, message) => (
     chai.request(url)
-    .post('/api/v1/post')
-    .set('Accept', 'application/x-www-form-urlencoded')
-    .set('Authorization', `Bearer ${token}`)
-    .send({
-      gameId: game.id,
-      message,
-    })
+      .post('/api/v1/post')
+      .set('Accept', 'application/x-www-form-urlencoded')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        gameId: game.id,
+        message,
+      })
+  ),
+
+  fetchGame: (token, gameId) => (
+    chai.request(url)
+      .get('/api/v1/game')
+      .set('Accept', 'application/x-www-form-urlencoded')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ gameId  })
+  ),
+
+  fetchScore: (token, gameId) => (
+    chai.request(url)
+      .get('/api/v1/score')
+      .set('Accept', 'application/x-www-form-urlencoded')
+      .set('Authorization', `Bearer ${token}`)
+      .query({ gameId })
+  ),
+
+  fetchPost: (token, gameId) => (
+    chai.request(url)
+      .get('/api/v1/post')
+      .set('Accept', 'application/x-www-form-urlencoded')
+      .set('Authorization', `Bearer ${token}`)
+      .query({ gameId })
   )
 }

@@ -1,5 +1,6 @@
 const PostModel = require('../models/post')
 const GameModel = require('../models/game')
+const ScoreModel = require('../models/score')
 
 const POST_COST = -5
 const DOWNVOTE_COST = -5
@@ -14,24 +15,56 @@ const KarmaHole = (game) => ({
       game,
       message,
     })
-    // await game.augmentPlayerScore(player, POST_COST).save()
-    await post.save()
+    const score = await ScoreModel.findOne({ 
+      'game': game._id, 
+      'player': player._id
+    })
+    score.score += POST_COST
+    await Promise.all([score.save(), post.save()])
     return post
   },
 
-  upvotePost: async function (user, post) {
-    // await Promise.all([
-    //   game.augmentPlayerScore(user, UPVOTE_COST).save(),
-    //   game.augmentPlayerScore(post.user, UPVOTE_AWARD).save(),
-    // ]);
+  upvotePost: async function (player, post) {
+    await Promise.all([
+      async () => {
+        const score = await ScoreModel.findOne({ 
+          'game': game._id, 
+          'player': player._id
+        })
+        score.score += UPVOTE_COST
+        await score.save()
+      },
+      async () => {
+        const score = await ScoreModel.findOne({ 
+          'game': game._id, 
+          'player': player._id
+        })
+        score.score += UPVOTE_AWARD
+        await score.save()
+      },
+    ])
     return game
   },
 
   downvotePost: async function (user, post) {
-    // await Promise.all([
-    //   game.augmentPlayerScore(user, DOWNVOTE_COST).save(),
-    //   game.augmentPlayerScore(post.user, DOWNVOTE_AWARD).save(),
-    // ]);
+    await Promise.all([
+      async () => {
+        const score = await ScoreModel.findOne({ 
+          'game': game._id, 
+          'player': player._id
+        })
+        score.score += DOWNVOTE_COST
+        await score.save()
+      },
+      async () => {
+        const score = await ScoreModel.findOne({ 
+          'game': game._id, 
+          'player': player._id
+        })
+        score.score += DOWNVOTE_AWARD
+        await score.save()
+      },
+    ])
     return game
   },
 })

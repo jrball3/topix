@@ -8,6 +8,7 @@ const ScoreFactory = {
     switch (game.type) {
       case GameType.KARMA_HOLE:
         initialScore = 50;
+        break;
       default:
         initialScore = 0
     }
