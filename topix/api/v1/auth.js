@@ -14,39 +14,30 @@ class V1AuthApi {
     app.use(rjwt({ secret: process.env.JWT_SECRET }).unless(this.unless))
     app.use(resolveUser())
 
-    app.post('/api/v1/auth', (req, res, next) => {
+    app.post('/api/v1/auth', async (req, res, next) => {
       const { username, password } = req.body
-      UserModel
-        .findOne({ username })
-        .then(user => {
-          if (!user) {
-            res.send(new errors.UnauthorizedError(
-              'Invalid username or password.'
-            ))
-            return next()
-          }
-          return user.authenticate(password)
-        })
-        .then(success => {
-          if (!success) {
-            res.send(new errors.UnauthorizedError(
-              'Invalid username or password.'
-            ))
-            return next()
-          }
-          // creating jsonwebtoken using the secret from config
-          const token = jwt.sign({ username }, process.env.JWT_SECRET, {
-            expiresIn: '30d'
-          })
-          // retrieve issue and expiration times
-          const { iat, exp } = jwt.decode(token)
-          res.send({ 'createdAt': iat, 'expiresAt': exp, token })
-          return next()
-        })
-        .catch(err => {
-          res.send(new errors.InternalServerError(err))
-          return next()
-        })
+      const user = await UserModel.findOne({ username })
+      if (!user) {
+        res.send(new errors.UnauthorizedError(
+          'Invalid username or password.'
+        ))
+        return next()
+      }
+      const success = await user.authenticate(password)
+      if (!success) {
+        res.send(new errors.UnauthorizedError(
+          'Invalid username or password.'
+        ))
+        return next()
+      }
+      // creating jsonwebtoken using the secret from config
+      const token = jwt.sign({ username }, process.env.JWT_SECRET, {
+        expiresIn: '30d'
+      })
+      // retrieve issue and expiration times
+      const { iat, exp } = jwt.decode(token)
+      res.send({ 'createdAt': iat, 'expiresAt': exp, token })
+      return next()
     })
   }
 
