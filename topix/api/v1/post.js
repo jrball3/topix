@@ -45,7 +45,7 @@ class V1PostApi {
           res.send(new errors.ResourceNotFoundError(`Game ${gameId} not found`))
           return next()
         }
-        const posts = [await PostModel.find({ game: gameId })]
+        const posts = await PostModel.find({ game: gameId })
         res.send({ posts })
       }
       catch (err) {
