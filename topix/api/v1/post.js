@@ -4,6 +4,13 @@ const Joi = require('joi')
 const GameModel = require('../../models/game')
 const PostModel = require('../../models/post')
 const StrategyFactory = require('../../mechanics/strategies')
+const Redlock = require('../../redlock-client')
+
+async function lockScore(user) {
+  const ttl = 1000;
+  const resource = 'locks:score:${user.id}';
+  return await Redlock.lock(resource, ttl)
+}
 
 class V1PostApi {
   applyGet (app) {
@@ -65,10 +72,14 @@ class V1PostApi {
           res.send(new errors.ResourceNotFoundError(`Game ${gameId} not found`))
           return next()
         }
+
+        const lock = await lockScore(user)
         const post = await StrategyFactory
           .strategyFor(game)
           .createPost(user, message)
         const savedPost = await post.save()
+        lock.unlock().catch((err) => console.log(err))
+
         res.send(savedPost)
       }
       catch (err) {
@@ -103,11 +114,13 @@ class V1PostApi {
           return next()
         }
 
+        const lock = await lockScore(user)
         const upvote = await StrategyFactory
           .strategyFor(post.game)
           .upvotePost(user, post)
-
+        lock.unlock().catch((err) => console.log(err))
         res.send({ upvote })
+
         return next()
       }
       catch (err) {
@@ -142,11 +155,13 @@ class V1PostApi {
           return next()
         }
 
+        const lock = await lockScore(user)
         const downvote = await StrategyFactory
           .strategyFor(post.game)
           .downvotePost(user, post)
-
+        lock.unlock().catch((err) => console.log(err))
         res.send({ downvote })
+
         return next()
       }
       catch (err) {
