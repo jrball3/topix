@@ -6,9 +6,9 @@ const PostModel = require('../../models/post')
 const StrategyFactory = require('../../mechanics/strategies')
 const Redlock = require('../../redlock-client')
 
-async function lockScore(user) {
+async function lockScore(user, game) {
   const ttl = 1000;
-  const resource = `locks:score:${user.id}`;
+  const resource = `locks:score:user[${user.id}]:game[${game.id}]`;
   return await Redlock.lock(resource, ttl)
 }
 
@@ -73,20 +73,22 @@ class V1PostApi {
           return next()
         }
 
-        const lock = await lockScore(user)
-        const strategy = StrategyFactory.strategyFor(game)
-        const canDo = await strategy.canCreatePost(user)
-        if (canDo) {
-          const post = await strategy.createPost(user, message)
-          const savedPost = await post.save()
+        const lock = await lockScore(user, game)
+        try {
+          const strategy = StrategyFactory.strategyFor(game)
+          const canDo = await strategy.canCreatePost(user)
+          if (canDo) {
+            const post = await strategy.createPost(user, message)
+            const savedPost = await post.save()
+            res.send({ post: savedPost })
+          }
+          else {
+            res.send(new errors.UnprocessableEntityError(
+              `You need at least a score of ${strategy.POST_COST} to post.`
+            ))
+          }
+        } finally {
           lock.unlock().catch((err) => console.log(err))
-          res.send({ post: savedPost })
-        }
-        else {
-          lock.unlock().catch((err) => console.log(err))
-          res.send(errors.UnprocessableEntityError(
-            `You need at least a score of ${strategy.POST_COST} to post.`
-          ))
         }
       }
       catch (err) {
@@ -121,18 +123,20 @@ class V1PostApi {
           return next()
         }
 
-        const lock = await lockScore(user)
-        const strategy = StrategyFactory.strategyFor(post.game)
-        const canDo = await strategy.canUpvotePost(user)
-        if (canDo) {
-          const upvote = await strategy.upvotePost(user, post)
+        const lock = await lockScore(user, post.game)
+        try {
+          const strategy = StrategyFactory.strategyFor(post.game)
+          const canDo = await strategy.canUpvotePost(user)
+          if (canDo) {
+            const upvote = await strategy.upvotePost(user, post)
+            res.send({ upvote })
+          } else {
+            res.send(errors.UnprocessableEntityError(
+              `You need at least a score of ${strategy.POST_COST} to upvote.`
+            ))
+          }
+        } finally {
           lock.unlock().catch((err) => console.log(err))
-          res.send({ upvote })
-        } else {
-          lock.unlock().catch((err) => console.log(err))
-          res.send(errors.UnprocessableEntityError(
-            `You need at least a score of ${strategy.POST_COST} to upvote.`
-          ))
         }
 
         return next()
@@ -169,18 +173,20 @@ class V1PostApi {
           return next()
         }
 
-        const lock = await lockScore(user)
-        const strategy = StrategyFactory.strategyFor(post.game)
-        const canDo = await strategy.canDownvotePost(user)
-        if (canDo) {
-          const downvote = await strategy.downvotePost(user, post)
+        const lock = await lockScore(user, post.game)
+        try {
+          const strategy = StrategyFactory.strategyFor(post.game)
+          const canDo = await strategy.canDownvotePost(user)
+          if (canDo) {
+            const downvote = await strategy.downvotePost(user, post)
+            res.send({ downvote })
+          } else {
+            res.send(errors.UnprocessableEntityError(
+              `You need at least a score of ${strategy.POST_COST} to downvote.`
+            ))
+          }
+        } finally {
           lock.unlock().catch((err) => console.log(err))
-          res.send({ downvote })
-        } else {
-          lock.unlock().catch((err) => console.log(err))
-          res.send(errors.UnprocessableEntityError(
-            `You need at least a score of ${strategy.POST_COST} to downvote.`
-          ))
         }
 
         return next()

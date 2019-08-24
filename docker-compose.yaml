@@ -21,6 +21,8 @@ services:
       REDIS_PASSWORD: ${REDIS_PASSWORD}
     ports:
       - 6379:6379
+    volumes:
+      - topix-redis-data:/data
   db:
     image: vepo/mongo
     ports:
@@ -32,3 +34,5 @@ services:
       APPLICATION_DATABASE: ${MONGO_DATABASE}
       APPLICATION_USER: ${MONGO_USERNAME}
       APPLICATION_PASS: ${MONGO_PASSWORD}
+volumes:
+  topix-redis-data:

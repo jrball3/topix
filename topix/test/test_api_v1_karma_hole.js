@@ -12,6 +12,7 @@ const {
   fetchGame,
   fetchScores,
 } = require('./helpers')
+const { _ } = require('lodash')
 
 
 const GameType = require('../models/game-type')
@@ -71,6 +72,21 @@ describe('api', function () {
         response = scoreRes
         expect(scoreRes).to.have.status(200)
         expect(scoreRes.body.scores.filter(s => s.player.username === user.username)[0].score).to.be.equal(45)
+      })
+
+      it('should properly reject a post with too low of a score', async function () {
+        this.timeout(5000)
+        const player2 = players[1]
+        const newUserAuth = await authUser(player2)
+        newUserToken = newUserAuth.body.token
+        await Promise.all(_.range(10).map(async () => {
+          const postRes = await createPost(newUserToken, game.id, 'this is my message')
+          response = postRes
+          expect(postRes).to.have.status(200)
+        }))
+        const postRes = await createPost(newUserToken, game.id, 'this is my message')
+        response = postRes
+        expect(postRes).to.have.status(422)
       })
 
       it('should properly handle an upvote', async function () {
