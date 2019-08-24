@@ -64,7 +64,7 @@ module.exports = {
       .send({ gameId  })
   ),
 
-  fetchScore: (token, gameId) => (
+  fetchScores: (token, gameId) => (
     chai.request(url)
       .get('/api/v1/score')
       .set('Accept', 'application/x-www-form-urlencoded')

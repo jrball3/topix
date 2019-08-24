@@ -53,6 +53,7 @@ describe('api', function () {
         const res = await createPost(token, game.id, 'this is my message')
         response = res
         expect(res).to.have.status(200)
+        expect(res.body.post.message).to.be.equal('this is my message')
       })
 
       it('should fetch a post', async function () {

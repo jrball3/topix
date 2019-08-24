@@ -10,7 +10,7 @@ const {
   createGame,
   createPost,
   fetchGame,
-  fetchScore,
+  fetchScores,
 } = require('./helpers')
 
 
@@ -34,7 +34,7 @@ describe('api', function () {
       before(async function () {
         this.timeout(5000)
         const regUser = await registerUser(user)
-        user.id = regUser.body.id
+        user.id = regUser.body.user.id
         const auth = await authUser(user)
         token = auth.body.token
         await Promise.all(players.map((player, idx) => 
@@ -58,34 +58,27 @@ describe('api', function () {
         game = res.body.game
       })
 
-      it('should properly handle a post', function (done) {
+      it('should properly handle a post', async function () {
         this.timeout(5000)
-        createPost(token, game.id, 'this is my message')
-          .then(function (res, err) {
-            response = res
-            if (err) throw err
-
-            expect(res).to.have.status(200)
-            expect(res.body).to.have.property('upvotes')
-            expect(res.body).to.have.property('downvotes')
-            expect(res.body.message).to.be.equal('this is my message')
-            expect(res.body.game.players.length).to.be.equal(4)
-
-            return fetchScore(token, game.id)
-          })
-          .then(function (res, err) {
-            response = res
-            if (err) throw err
-            expect(res).to.have.status(200)
-            expect(res.body.score.filter(s => s.player.username === user.username)[0].score).to.be.equal(45)
-            done()
-          })
+        const postRes = await createPost(token, game.id, 'this is my message')
+        response = postRes
+        expect(postRes).to.have.status(200)
+        expect(postRes.body.post).to.have.property('upvotes')
+        expect(postRes.body.post).to.have.property('downvotes')
+        expect(postRes.body.post.message).to.be.equal('this is my message')
+        expect(postRes.body.post.game.players.length).to.be.equal(4)
+        const scoreRes = await fetchScores(token, game.id)
+        response = scoreRes
+        expect(scoreRes).to.have.status(200)
+        expect(scoreRes.body.scores.filter(s => s.player.username === user.username)[0].score).to.be.equal(45)
       })
 
       it('should properly handle an upvote', async function () {
         this.timeout(5000)
         const postRes = await createPost(token, game.id, 'this is my message')
-        const postId = postRes.body.id
+        response = postRes
+        expect(postRes).to.have.status(200)
+        const postId = postRes.body.post.id
         const res = await chai.request(url)
           .post(`/api/v1/post/${postId}/upvote`)
           .set('Accept', 'application/x-www-form-urlencoded')
@@ -100,7 +93,9 @@ describe('api', function () {
       it('should properly reject a self upvote', async function () {
         this.timeout(5000)
         const postRes = await createPost(token, game.id, 'this is my message')
-        const postId = postRes.body.id
+        response = postRes
+        expect(postRes).to.have.status(200)
+        const postId = postRes.body.post.id
         const res = await chai.request(url)
           .post(`/api/v1/post/${postId}/upvote`)
           .set('Accept', 'application/x-www-form-urlencoded')
@@ -113,7 +108,9 @@ describe('api', function () {
       it('should properly handle an downvote', async function () {
         this.timeout(5000)
         const postRes = await createPost(token, game.id, 'this is my message')
-        const postId = postRes.body.id
+        response = postRes
+        expect(postRes).to.have.status(200)
+        const postId = postRes.body.post.id
         const res = await chai.request(url)
           .post(`/api/v1/post/${postId}/downvote`)
           .set('Accept', 'application/x-www-form-urlencoded')
@@ -128,7 +125,9 @@ describe('api', function () {
       it('should properly reject a self downvote', async function () {
         this.timeout(5000)
         const postRes = await createPost(token, game.id, 'this is my message')
-        const postId = postRes.body.id
+        response = postRes
+        expect(postRes).to.have.status(200)
+        const postId = postRes.body.post.id
         const res = await chai.request(url)
           .post(`/api/v1/post/${postId}/downvote`)
           .set('Accept', 'application/x-www-form-urlencoded')

@@ -8,7 +8,7 @@ const Redlock = require('../../redlock-client')
 
 async function lockScore(user) {
   const ttl = 1000;
-  const resource = 'locks:score:${user.id}';
+  const resource = `locks:score:${user.id}`;
   return await Redlock.lock(resource, ttl)
 }
 
@@ -18,7 +18,7 @@ class V1PostApi {
       postId: Joi.string().required(),
     })
 
-    app.get('/api/v1/post/:postId', validator(schema), async (req, res, next) => {
+    app.get('/api/v1/post/:postId', validator(schema, 'params'), async (req, res, next) => {
       const { postId } = req.params
       try {
         const post = await PostModel.findById(postId)
@@ -74,13 +74,21 @@ class V1PostApi {
         }
 
         const lock = await lockScore(user)
-        const post = await StrategyFactory
-          .strategyFor(game)
-          .createPost(user, message)
-        const savedPost = await post.save()
-        lock.unlock().catch((err) => console.log(err))
+        const strategy = StrategyFactory.strategyFor(game)
+        const canDo = await strategy.canCreatePost(user)
+        if (canDo) {
+          const post = await strategy.createPost(user, message)
+          const savedPost = await post.save()
+          lock.unlock().catch((err) => console.log(err))
+          res.send({ post: savedPost })
+        }
+        else {
+          lock.unlock().catch((err) => console.log(err))
+          res.send(errors.UnprocessableEntityError(
+            `You need at least a score of ${strategy.POST_COST} to post.`
+          ))
+        }
 
-        res.send(savedPost)
       }
       catch (err) {
         console.error(err)
@@ -115,11 +123,18 @@ class V1PostApi {
         }
 
         const lock = await lockScore(user)
-        const upvote = await StrategyFactory
-          .strategyFor(post.game)
-          .upvotePost(user, post)
-        lock.unlock().catch((err) => console.log(err))
-        res.send({ upvote })
+        const strategy = StrategyFactory.strategyFor(post.game)
+        const canDo = await strategy.canUpvotePost(user)
+        if (canDo) {
+          const upvote = await strategy.upvotePost(user, post)
+          lock.unlock().catch((err) => console.log(err))
+          res.send({ upvote })
+        } else {
+          lock.unlock().catch((err) => console.log(err))
+          res.send(errors.UnprocessableEntityError(
+            `You need at least a score of ${strategy.POST_COST} to upvote.`
+          ))
+        }
 
         return next()
       }
@@ -156,11 +171,18 @@ class V1PostApi {
         }
 
         const lock = await lockScore(user)
-        const downvote = await StrategyFactory
-          .strategyFor(post.game)
-          .downvotePost(user, post)
-        lock.unlock().catch((err) => console.log(err))
-        res.send({ downvote })
+        const strategy = StrategyFactory.strategyFor(post.game)
+        const canDo = await strategy.canDownvotePost(user)
+        if (canDo) {
+          const downvote = await strategy.downvotePost(user, post)
+          lock.unlock().catch((err) => console.log(err))
+          res.send({ downvote })
+        } else {
+          lock.unlock().catch((err) => console.log(err))
+          res.send(errors.UnprocessableEntityError(
+            `You need at least a score of ${strategy.POST_COST} to downvote.`
+          ))
+        }
 
         return next()
       }
