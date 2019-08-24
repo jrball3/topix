@@ -46,7 +46,6 @@ class V1FriendshipApi {
     })
 
     app.post('/api/v1/friendship', validator(schema), async (req, res, next) => {
-      console.log(`friendship post with body: ${JSON.stringify(req.body)}`)
       try {
         const friend = await UserModel.findOne({ username: req.body.username })
         if (!friend) {
@@ -67,16 +66,21 @@ class V1FriendshipApi {
 
   applyGet (app) {
     app.get('/api/v1/friendship', (req, res, next) => {
-      UserModel.getFriends(req.user, function (err, friendships) {
-        // friendships looks like:
-        // [{status: "pending", added: <Date added>, friend: user1}]
-        if (err) {
-          res.send(new errors.InternalServerError(err))
+      try {
+        UserModel.getFriends(req.user, function (err, friendships) {
+          // friendships looks like:
+          // [{status: "pending", added: <Date added>, friend: user1}]
+          if (err) {
+            res.send(new errors.InternalServerError(err))
+            return next()
+          }
+          res.send(friendships)
           return next()
-        }
-        res.send(friendships)
+        })
+      } catch (err) {
+        res.send(errors.InternalServerError(err))
         return next()
-      })
+      }
     })
   }
 

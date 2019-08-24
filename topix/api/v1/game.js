@@ -14,8 +14,8 @@ class V1GameApi {
     })
 
     app.get('/api/v1/game', validator(schema), async (req, res, next) => {
-      const { gameId } = req.body
       try {
+        const { gameId } = req.body
         const game = await GameModel.findById(gameId)
         res.send({ game })
       } catch (err) {
@@ -33,26 +33,26 @@ class V1GameApi {
     })
 
     app.post('/api/v1/game', validator(schema), async (req, res, next) => {
-      const { user } = req
-      const { name, type } = req.body
-      const notFound = []
-      const playerErrors = []
-      const players = [user]
-      const usernames = (req.body.players || [])
-
-      await Promise.all(usernames.map(function (un) {
-        return UserModel.findOne({ username: un })
-          .then(function (doc) {
-            if (doc) players.push(doc)
-            else notFound.push(un)
-          })
-          .catch(function (err) {
-            console.error(err)
-            playerErrors.push(err)
-          })
-      }))
-
       try {
+        const { user } = req
+        const { name, type } = req.body
+        const notFound = []
+        const playerErrors = []
+        const players = [user]
+        const usernames = (req.body.players || [])
+
+        await Promise.all(usernames.map(function (un) {
+          return UserModel.findOne({ username: un })
+            .then(function (doc) {
+              if (doc) players.push(doc)
+              else notFound.push(un)
+            })
+            .catch(function (err) {
+              console.error(err)
+              playerErrors.push(err)
+            })
+        }))
+
         const { game, scores } = await GameFactory.gameFor(name, type, players)
         await Promise.all(scores.map(s => s.save()))
         game.scores.push(...scores)

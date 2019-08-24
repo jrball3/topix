@@ -22,28 +22,33 @@ class V1AuthApi {
     })
 
     app.post('/api/v1/auth', validator(schema), async (req, res, next) => {
-      const { username, password } = req.body
-      const user = await UserModel.findOne({ username })
-      if (!user) {
-        res.send(new errors.UnauthorizedError(
-          'Invalid username or password.'
-        ))
-        return next()
+      try {
+        const { username, password } = req.body
+        const user = await UserModel.findOne({ username })
+        if (!user) {
+          res.send(new errors.UnauthorizedError(
+            'Invalid username or password.'
+          ))
+          return next()
+        }
+        const success = await user.authenticate(password)
+        if (!success) {
+          res.send(new errors.UnauthorizedError(
+            'Invalid username or password.'
+          ))
+          return next()
+        }
+        // creating jsonwebtoken using the secret from config
+        const token = jwt.sign({ username }, process.env.JWT_SECRET, {
+          expiresIn: '30d'
+        })
+        // retrieve issue and expiration times
+        const { iat, exp } = jwt.decode(token)
+        res.send({ 'createdAt': iat, 'expiresAt': exp, token })
+      } catch (err) {
+        console.log(err)
+        res.send(errors.InternalServerError(err))
       }
-      const success = await user.authenticate(password)
-      if (!success) {
-        res.send(new errors.UnauthorizedError(
-          'Invalid username or password.'
-        ))
-        return next()
-      }
-      // creating jsonwebtoken using the secret from config
-      const token = jwt.sign({ username }, process.env.JWT_SECRET, {
-        expiresIn: '30d'
-      })
-      // retrieve issue and expiration times
-      const { iat, exp } = jwt.decode(token)
-      res.send({ 'createdAt': iat, 'expiresAt': exp, token })
       return next()
     })
   }

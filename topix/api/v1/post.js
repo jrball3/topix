@@ -19,8 +19,8 @@ class V1PostApi {
     })
 
     app.get('/api/v1/post/:postId', validator(schema, 'params'), async (req, res, next) => {
-      const { postId } = req.params
       try {
+        const { postId } = req.params
         const post = await PostModel.findById(postId)
         res.send({ post })
       }
@@ -38,8 +38,8 @@ class V1PostApi {
     })
 
     app.get('/api/v1/post', validator(schema), async (req, res, next) => {
-      const { gameId } = req.query
       try {
+        const { gameId } = req.query
         const game = await GameModel.findById(gameId)
         if (!game) {
           res.send(new errors.ResourceNotFoundError(`Game ${gameId} not found`))
@@ -64,9 +64,9 @@ class V1PostApi {
     })
 
     app.post('/api/v1/post', validator(schema), async (req, res, next) => {
-      const { user } = req
-      const { gameId, message } = req.body
       try {
+        const { user } = req
+        const { gameId, message } = req.body
         const game = await GameModel.findById(gameId)
         if (!game) {
           res.send(new errors.ResourceNotFoundError(`Game ${gameId} not found`))
@@ -88,7 +88,6 @@ class V1PostApi {
             `You need at least a score of ${strategy.POST_COST} to post.`
           ))
         }
-
       }
       catch (err) {
         console.error(err)
@@ -104,9 +103,9 @@ class V1PostApi {
     })
 
     app.post('/api/v1/post/:postId/upvote', validator(schema), async (req, res, next) => {
-      const { user } = req
-      const { postId } = req.params
       try {
+        const { user } = req
+        const { postId } = req.params
         const post = await PostModel
           .findById(postId)
           .populate('game')
@@ -152,9 +151,9 @@ class V1PostApi {
     })
 
     app.post('/api/v1/post/:postId/downvote', validator(schema), async (req, res, next) => {
-      const { user } = req
-      const { postId } = req.params
       try {
+        const { user } = req
+        const { postId } = req.params
         const post = await PostModel
           .findById(postId)
           .populate('game')
