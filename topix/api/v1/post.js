@@ -84,7 +84,7 @@ class V1PostApi {
           }
           else {
             res.send(new errors.UnprocessableEntityError(
-              `You need at least a score of ${strategy.POST_COST} to post.`
+              `You need at least a score of ${Math.abs(strategy.POST_COST)} to post.`
             ))
           }
         } finally {

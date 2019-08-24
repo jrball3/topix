@@ -4,9 +4,9 @@ const UpvoteModel = require('../models/upvote')
 const DownvoteModel = require('../models/downvote')
 
 const KarmaHole = (game) => ({
-  POST_COST: 5,
-  DOWNVOTE_COST: 5,
-  DOWNVOTE_AWARD: 10,
+  POST_COST: -5,
+  DOWNVOTE_COST: -5,
+  DOWNVOTE_AWARD: -10,
   UPVOTE_COST: 5,
   UPVOTE_AWARD: 10,
 
@@ -15,7 +15,7 @@ const KarmaHole = (game) => ({
       'game': game._id, 
       'player': player._id
     })
-    return score.score >= this.POST_COST
+    return (score.score + this.POST_COST) >= 0
   },
   
   createPost: async function (player, message) {
@@ -28,7 +28,7 @@ const KarmaHole = (game) => ({
       'game': game._id, 
       'player': player._id
     })
-    score.score -= this.POST_COST
+    score.score += this.POST_COST
     await Promise.all([score.save(), post.save()])
     return post
   },
@@ -42,7 +42,7 @@ const KarmaHole = (game) => ({
       'game': game._id, 
       'player': player._id
     })
-    playerScore.score -= this.UPVOTE_COST
+    playerScore.score += this.UPVOTE_COST
     playerScore.save()
 
     const authorScore = await ScoreModel.findOne({ 
@@ -66,7 +66,7 @@ const KarmaHole = (game) => ({
       'game': game._id, 
       'player': player._id
     })
-    return score.score >= this.DOWNVOTE_COST
+    return (score.score + this.DOWNVOTE_COST) >= 0
   },
 
   downvotePost: async function (player, post) {
@@ -74,7 +74,7 @@ const KarmaHole = (game) => ({
       'game': game._id, 
       'player': player._id
     })
-    playerScore.score -= this.DOWNVOTE_COST
+    playerScore.score += this.DOWNVOTE_COST
     playerScore.save()
 
     const authorScore = await ScoreModel.findOne({ 
