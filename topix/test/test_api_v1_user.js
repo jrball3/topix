@@ -34,10 +34,10 @@ describe('api', function () {
               response = res
               if (err) throw err
               expect(res).to.have.status(200)
-              expect(res.body.firstName).to.equal(user.firstName)
-              expect(res.body.lastName).to.equal(user.lastName)
-              expect(res.body.username).to.equal(user.username)
-              expect(res.body.email).to.equal(user.email)
+              expect(res.body.user.firstName).to.equal(user.firstName)
+              expect(res.body.user.lastName).to.equal(user.lastName)
+              expect(res.body.user.username).to.equal(user.username)
+              expect(res.body.user.email).to.equal(user.email)
               done()
             })
         })
@@ -145,11 +145,11 @@ describe('api', function () {
               response = res
               if (err) throw err
               expect(res).to.have.status(200)
-              expect(res.body.firstName).to.equal(user.firstName)
-              expect(res.body.lastName).to.equal(user.lastName)
-              expect(res.body.username).to.equal(user.username)
-              expect(res.body.email).to.equal(user.email)
-              expect(res.body.passwordHash).to.not.equal(null)
+              expect(res.body.user.firstName).to.equal(user.firstName)
+              expect(res.body.user.lastName).to.equal(user.lastName)
+              expect(res.body.user.username).to.equal(user.username)
+              expect(res.body.user.email).to.equal(user.email)
+              expect(res.body.user.passwordHash).to.not.equal(null)
               done()
             })
         })

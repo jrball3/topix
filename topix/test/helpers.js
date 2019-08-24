@@ -72,9 +72,13 @@ module.exports = {
       .query({ gameId })
   ),
 
-  fetchPost: (token, gameId) => (
+  fetchPost: ({
+    token, 
+    gameId, 
+    postId,
+  }) => (
     chai.request(url)
-      .get('/api/v1/post')
+      .get(postId ? `/api/v1/post/${postId}`: '/api/v1/post')
       .set('Accept', 'application/x-www-form-urlencoded')
       .set('Authorization', `Bearer ${token}`)
       .query({ gameId })

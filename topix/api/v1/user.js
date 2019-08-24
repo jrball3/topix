@@ -50,13 +50,13 @@ class V1UserApi {
         return next()
       }
 
-      res.send(savedUser)
+      res.send({ user: savedUser })
     })
   }
 
   applyGet (app) {
     app.get('/api/v1/user', (req, res, next) => {
-      res.send(req.user)
+      res.send({'user': req.user })
       return next()
     })
   }

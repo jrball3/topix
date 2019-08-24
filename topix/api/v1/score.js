@@ -11,7 +11,6 @@ class V1ScoreApi {
     })
 
     app.get('/api/v1/score', validator(schema), async (req, res, next) => {
-      const { user } = req
       const { gameId } = req.query
       try {
         const score = await ScoreModel

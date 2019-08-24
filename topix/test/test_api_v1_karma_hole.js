@@ -23,7 +23,7 @@ const url = 'http://localhost:3000'
 describe('api', function () {
   describe('v1', function () {
     describe('karma hole', function () {
-      let response, token, game
+      let response, token, player1Token, game
       let user = mockUserDetails()
       const players = [
         mockUserDetails(), 
@@ -37,7 +37,14 @@ describe('api', function () {
         user.id = regUser.body.id
         const auth = await authUser(user)
         token = auth.body.token
-        await Promise.all(players.map(player => registerUser(player)))
+        await Promise.all(players.map((player, idx) => 
+          registerUser(player)
+          .then( function (res) {
+            players[idx].id = res.body.user.id
+          })
+        ))
+        const player1Auth = await authUser(players[0])
+        player1Token = player1Auth.body.token
       })
 
       before(async function () {
@@ -80,14 +87,27 @@ describe('api', function () {
         const postRes = await createPost(token, game.id, 'this is my message')
         const postId = postRes.body.id
         const res = await chai.request(url)
-          .post('/api/v1/upvote')
+          .post(`/api/v1/post/${postId}/upvote`)
           .set('Accept', 'application/x-www-form-urlencoded')
-          .set('Authorization', `Bearer ${token}`)
-          .send({ postId })
+          .set('Authorization', `Bearer ${player1Token}`)
+          .send()
         response = res
         expect(res).to.have.status(200)
         expect(res.body.upvote.post).to.be.equal(postId)
-        expect(res.body.upvote.user).to.be.equal(user.id)
+        expect(res.body.upvote.user).to.be.equal(players[0].id)
+      })
+
+      it('should properly reject a self upvote', async function () {
+        this.timeout(5000)
+        const postRes = await createPost(token, game.id, 'this is my message')
+        const postId = postRes.body.id
+        const res = await chai.request(url)
+          .post(`/api/v1/post/${postId}/upvote`)
+          .set('Accept', 'application/x-www-form-urlencoded')
+          .set('Authorization', `Bearer ${token}`)
+          .send()
+        response = res
+        expect(res).to.have.status(401)
       })
 
       it('should properly handle an downvote', async function () {
@@ -95,14 +115,27 @@ describe('api', function () {
         const postRes = await createPost(token, game.id, 'this is my message')
         const postId = postRes.body.id
         const res = await chai.request(url)
-          .post('/api/v1/downvote')
+          .post(`/api/v1/post/${postId}/downvote`)
           .set('Accept', 'application/x-www-form-urlencoded')
-          .set('Authorization', `Bearer ${token}`)
-          .send({ postId })
+          .set('Authorization', `Bearer ${player1Token}`)
+          .send()
         response = res
         expect(res).to.have.status(200)
         expect(res.body.downvote.post).to.be.equal(postId)
-        expect(res.body.downvote.user).to.be.equal(user.id)
+        expect(res.body.downvote.user).to.be.equal(players[0].id)
+      })
+
+      it('should properly reject a self downvote', async function () {
+        this.timeout(5000)
+        const postRes = await createPost(token, game.id, 'this is my message')
+        const postId = postRes.body.id
+        const res = await chai.request(url)
+          .post(`/api/v1/post/${postId}/downvote`)
+          .set('Accept', 'application/x-www-form-urlencoded')
+          .set('Authorization', `Bearer ${token}`)
+          .send()
+        response = res
+        expect(res).to.have.status(401)
       })
 
       afterEach(function () {

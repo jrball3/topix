@@ -8,6 +8,25 @@ const StrategyFactory = require('../../mechanics/strategies')
 class V1PostApi {
   applyGet (app) {
     const schema = Joi.object().keys({
+      postId: Joi.string().required(),
+    })
+
+    app.get('/api/v1/post/:postId', validator(schema), async (req, res, next) => {
+      const { postId } = req.params
+      try {
+        const post = await PostModel.findById(postId)
+        res.send({ post })
+      }
+      catch (err) {
+        console.error(err)
+        res.send(new errors.InternalServerError(err)) 
+      }
+      return next()
+    })
+  }
+
+  applyIndex (app) {
+    const schema = Joi.object().keys({
       gameId: Joi.string().required(),
     })
 
@@ -19,7 +38,7 @@ class V1PostApi {
           res.send(new errors.ResourceNotFoundError(`Game ${gameId} not found`))
           return next()
         }
-        const posts = await PostModel.find({'game': gameId})
+        const posts = [await PostModel.find({ game: gameId })]
         res.send({ posts })
       }
       catch (err) {
@@ -30,6 +49,7 @@ class V1PostApi {
     })
   }
 
+
   applyPost (app) {
     const schema = Joi.object().keys({
       gameId: Joi.string().required(),
@@ -39,12 +59,12 @@ class V1PostApi {
     app.post('/api/v1/post', validator(schema), async (req, res, next) => {
       const { user } = req
       const { gameId, message } = req.body
-      const game = await GameModel.findById(gameId)
-      if (!game) {
-        res.send(new errors.ResourceNotFoundError(`Game ${gameId} not found`))
-        return next()
-      }
       try {
+        const game = await GameModel.findById(gameId)
+        if (!game) {
+          res.send(new errors.ResourceNotFoundError(`Game ${gameId} not found`))
+          return next()
+        }
         const post = await StrategyFactory
           .strategyFor(game)
           .createPost(user, message)
@@ -64,13 +84,22 @@ class V1PostApi {
       postId: Joi.string().required(),
     })
 
-    app.post('/api/v1/upvote', validator(schema), async (req, res, next) => {
+    app.post('/api/v1/post/:postId/upvote', validator(schema), async (req, res, next) => {
       const { user } = req
-      const { postId } = req.body
+      const { postId } = req.params
       try {
-        const post = await PostModel.findById(postId).populate('game')
+        const post = await PostModel
+          .findById(postId)
+          .populate('game')
+          .populate('author')
+
         if (!post) {
           res.send(new errors.ResourceNotFoundError(`Post ${postId} not found!`))
+          return next()
+        }
+
+        if (post.author.id == user.id) {
+          res.send(new errors.UnauthorizedError('Users cannot upvote their own posts.'))
           return next()
         }
 
@@ -94,13 +123,22 @@ class V1PostApi {
       postId: Joi.string().required(),
     })
 
-    app.post('/api/v1/downvote', validator(schema), async (req, res, next) => {
+    app.post('/api/v1/post/:postId/downvote', validator(schema), async (req, res, next) => {
       const { user } = req
-      const { postId } = req.body
+      const { postId } = req.params
       try {
-        const post = await PostModel.findById(postId).populate('game')
+        const post = await PostModel
+          .findById(postId)
+          .populate('game')
+          .populate('author')
+
         if (!post) {
           res.send(new errors.ResourceNotFoundError(`Post ${postId} not found!`))
+          return next()
+        }
+
+        if (post.author.id == user.id) {
+          res.send(new errors.UnauthorizedError('Users cannot downvote their own posts.'))
           return next()
         }
 
@@ -121,6 +159,7 @@ class V1PostApi {
 
   apply (app) {
     this.applyGet(app)
+    this.applyIndex(app)
     this.applyPost(app)
     this.applyUpvote(app)
     this.applyDownvote(app)

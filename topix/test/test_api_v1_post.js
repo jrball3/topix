@@ -57,7 +57,7 @@ describe('api', function () {
 
       it('should fetch a post', async function () {
         await createPost(token, game.id, 'this is my message')
-        const res = await fetchPost(token, game.id)
+        const res = await fetchPost({token, 'gameId': game.id})
         response = res
         expect(res).to.have.status(200)
         expect(res.body).to.have.property('posts')
