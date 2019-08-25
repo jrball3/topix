@@ -3,6 +3,22 @@ const validator = require('../../middleware/validate')
 const UserModel = require('../../models/user')
 const errors = require('restify-errors')
 
+/**
+ * @swagger
+ *
+ * /api/v1/friendship:
+ *   post:
+ *     description: Send a friend request
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: username
+ *         description: The username of the user to which to send a friend request.
+ *         in: formData
+ *         required: true
+ *         type: string
+*/
+
 class V1FriendshipApi {
   _createRequest (user, friend, res, next) {
     UserModel.requestFriend(user._id, friend._id, function (err, doc) {

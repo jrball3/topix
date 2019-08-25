@@ -4,6 +4,8 @@ const V1FriendshipApi = require('./api/v1/friendship').V1FriendshipApi
 const V1GameApi = require('./api/v1/game').V1GameApi
 const V1PostApi = require('./api/v1/post').V1PostApi
 const V1ScoreApi = require('./api/v1/score').V1ScoreApi
+const applySwagger = require('./swagger')
+
 const restify = require('restify')
 require('./database')
 
@@ -11,12 +13,19 @@ const app = restify.createServer()
 app.use(restify.plugins.queryParser())
 app.use(restify.plugins.bodyParser())
 
-const auth = new V1AuthApi({
+const excludeFromAuth = {
   path: [
     /api\/v1\/auth.*/,
-    { url: /api\/v1\/user.*/, methods: ['POST'] }
+    { url: /api\/v1\/user.*/, methods: ['POST'] },
+    '/docs',
+    /\/docs\/+.*/,
   ]
+}
+
+const auth = new V1AuthApi({
+  excludePaths: excludeFromAuth
 })
+
 auth.apply(app)
 
 const user = new V1UserApi()
@@ -33,5 +42,7 @@ post.apply(app)
 
 const score = new V1ScoreApi()
 score.apply(app)
+
+applySwagger(app)
 
 module.exports = app

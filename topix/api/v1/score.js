@@ -3,6 +3,26 @@ const validator = require('../../middleware/validate')
 const Joi = require('joi')
 const ScoreModel = require('../../models/score')
 
+/**
+ * @swagger
+ *
+ * /api/v1/score:
+ *   get:
+ *     description: Fetch a single score, or all scores
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: scoreId
+ *         description: User's first name
+ *         in: formData
+ *         required: false
+ *         type: string
+ *       - name: gameId
+ *         description: User's last name.
+ *         in: formData
+ *         required: false
+ *         type: string
+*/
 class V1ScoreApi {
 
   applyGet (app) {

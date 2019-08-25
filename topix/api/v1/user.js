@@ -4,6 +4,47 @@ const validator = require('../../middleware/validate')
 const UserModel = require('../../models/user')
 const passwords = require('../../utilities/passwords')
 
+/**
+ * @swagger
+ *
+ * /api/v1/user:
+ *   post:
+ *     description: Create a user account
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: firstName
+ *         description: User's first name
+ *         in: formData
+ *         required: true
+ *         type: string
+ *       - name: lastName
+ *         description: User's last name.
+ *         in: formData
+ *         required: true
+ *         type: string
+ *       - name: displayName
+ *         description: The name that will be displayed to other users.
+ *         in: formData
+ *         required: true
+ *         type: string
+ *       - name: username
+ *         description: The user's username for login purposes.
+ *         in: formData
+ *         required: true
+ *         type: string
+ *       - name: email
+ *         description: The user's e-mail address.
+ *         in: formData
+ *         required: true
+ *         type: string
+ *       - name: password
+ *         description: User's password.
+ *         in: formData
+ *         required: true
+ *         type: string
+*/
+
 class V1UserApi {
   applyPost (app) {
     const schema = Joi.object().keys({

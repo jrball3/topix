@@ -6,14 +6,35 @@ const resolveUser = require('../../middleware/resolve-user')
 const validator = require('../../middleware/validate')
 const Joi = require('joi')
 
+/**
+ * @swagger
+ *
+ * /api/v1/auth:
+ *   post:
+ *     description: Create a user account
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: username
+ *         description: The user's username for login purposes.
+ *         in: formData
+ *         required: true
+ *         type: string
+ *       - name: password
+ *         description: User's password.
+ *         in: formData
+ *         required: true
+ *         type: string
+*/
+
 class V1AuthApi {
-  constructor (unless) {
-    this.unless = unless
+  constructor ({ excludePaths }) {
+    this.excludePaths = excludePaths
   }
 
   applyPost (app) {
     // using restify-jwt to lock down everything except /auth
-    app.use(rjwt({ secret: process.env.JWT_SECRET }).unless(this.unless))
+    app.use(rjwt({ secret: process.env.JWT_SECRET }).unless(this.excludePaths))
     app.use(resolveUser())
 
     const schema = Joi.object().keys({

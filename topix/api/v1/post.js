@@ -6,6 +6,73 @@ const PostModel = require('../../models/post')
 const StrategyFactory = require('../../mechanics/strategies')
 const Redlock = require('../../redlock-client')
 
+/**
+ * @swagger
+ *
+ * /api/v1/post/{postId}:
+ *   get:
+ *     description: Fetch the state of a post
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: postId
+ *         description: The ID of the post.
+ *         in: path
+ *         required: true
+ *         type: string
+ * 
+ * /api/v1/post:
+ *   get:
+ *     description: Fetch all posts for a game
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: gameId
+ *         description: The ID of the game.
+ *         in: formData
+ *         required: true
+ *         type: string
+ *   post:
+ *     description: Create a post in a game
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: gameId
+ *         description: The ID of the game.
+ *         in: formData
+ *         required: true
+ *         type: string
+ *       - name: message
+ *         description: The content of the message.
+ *         in: formData
+ *         required: true
+ *         type: string
+ * 
+  * /api/v1/upvote:
+ *   get:
+ *     description: Upvote a post
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: postId
+ *         description: The ID of the post.
+ *         in: formData
+ *         required: true
+ *         type: string
+ * 
+ * /api/v1/downvote:
+ *   get:
+ *     description: Downvote a post
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: postId
+ *         description: The ID of the post.
+ *         in: formData
+ *         required: true
+ *         type: string
+*/
+
 async function lockScore(user, game) {
   const ttl = 1000;
   const resource = `locks:score:user[${user.id}]:game[${game.id}]`;
@@ -55,7 +122,6 @@ class V1PostApi {
       return next()
     })
   }
-
 
   applyPost (app) {
     const schema = Joi.object().keys({

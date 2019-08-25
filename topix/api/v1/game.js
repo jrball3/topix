@@ -6,6 +6,50 @@ const UserModel = require('../../models/user')
 const GameModel = require('../../models/game')
 const GameFactory = require('../../factories/game')
 
+/**
+ * @swagger
+ * 
+ * /api/v1/game/:
+ *   get:
+ *     description: Fetch the state of a game
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: gameId
+ *         description: The ID of the game.
+ *         in: formData
+ *         required: true
+ *         type: string
+ *   post:
+ *     description: Create a game
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: name
+ *         description: The name of the game.
+ *         in: formData
+ *         required: true
+ *         type: string
+ *       - name: type
+ *         description: The type of the game.
+ *         in: formData
+ *         required: true
+ *         type: string
+ *       - name: players
+ *         description: The name of the game.
+ *         in: formData
+ *         required: true
+ *         type: array
+ *       - components:
+ *         - securitySchemes:
+ *           - bearerAuth:
+ *             type: http
+ *             scheme: bearer
+ *             bearerFormat: JWT  # optional, for documentation purposes only
+ *       - security:
+ *         - bearerAuth: []
+*/
+
 class V1GameApi {
 
   applyGet (app) {
