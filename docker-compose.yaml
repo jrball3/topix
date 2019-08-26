@@ -14,7 +14,7 @@ services:
       MONGO_DATABASE: ${MONGO_DATABASE}
       MONGO_PORT: 27017
       JWT_SECRET: ${JWT_SECRET}
-      WAIT_HOSTS: db:27017
+      WAIT_HOSTS: db:27017,redis:6379
   redis:
     image: redis
     environment:
@@ -22,7 +22,7 @@ services:
     ports:
       - 6379:6379
     volumes:
-      - topix-redis-data:/data
+      - topix-redis-data:/data/db
   db:
     image: vepo/mongo
     ports:

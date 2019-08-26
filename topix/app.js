@@ -13,6 +13,12 @@ const app = restify.createServer()
 app.use(restify.plugins.queryParser())
 app.use(restify.plugins.bodyParser())
 
+// default health check
+app.get('/', (req, res, next) => {
+  res.send({'status': 'OK'})
+  return next()
+})
+
 const excludeFromAuth = {
   path: [
     /api\/v1\/auth.*/,

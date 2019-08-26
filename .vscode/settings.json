@@ -1,6 +1,0 @@
-{
-  "mochaExplorer.cwd": "topix/",
-  "mochaExplorer.envPath": "topix/.env",
-  "yarn.packageJson": "topix/package.json",
-  "debug.node.autoAttach": "on",
-}
