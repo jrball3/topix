@@ -8,6 +8,8 @@ services:
     depends_on:
       - db
     environment:
+      REDIS_URL: ${REDIS_URL}
+      REDIS_PORT: ${REDIS_PORT}
       MONGO_HOST: db
       MONGO_USERNAME: ${MONGO_USERNAME}
       MONGO_PASSWORD: ${MONGO_PASSWORD}

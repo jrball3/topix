@@ -23,6 +23,7 @@
     "jsonwebtoken": "^8.4.0",
     "lodash": "^4.17.15",
     "mongoose": "^5.4.10",
+    "morgan": "^1.9.1",
     "nodemon": "^1.18.9",
     "redis": "^2.8.0",
     "redlock": "^4.0.0",

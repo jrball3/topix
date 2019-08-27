@@ -4,6 +4,7 @@ const V1FriendshipApi = require('./api/v1/friendship').V1FriendshipApi
 const V1GameApi = require('./api/v1/game').V1GameApi
 const V1PostApi = require('./api/v1/post').V1PostApi
 const V1ScoreApi = require('./api/v1/score').V1ScoreApi
+const logger  = require('morgan')
 const applySwagger = require('./swagger')
 
 const restify = require('restify')
@@ -12,6 +13,7 @@ require('./database')
 const app = restify.createServer()
 app.use(restify.plugins.queryParser())
 app.use(restify.plugins.bodyParser())
+app.use(logger('dev'))
 
 // default health check
 app.get('/', (req, res, next) => {
