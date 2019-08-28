@@ -3427,9 +3427,9 @@ onetime@^2.0.0:
     mimic-fn "^1.0.0"
 
 ono@^5.0.1:
-  version "5.0.1"
-  resolved "https://registry.yarnpkg.com/ono/-/ono-5.0.1.tgz#a39e0af7ab2c2a143a06f08ad9d187e61f9da0c8"
-  integrity sha512-4/4BPGHX8OuDDNx1SrOqTOI7zajPjvBvrG1jDG3hDq4qBpoKlzG2d83Vdz26hvv0FFWYsLdHf+1Vu/k2d8Ww9w==
+  version "5.0.2"
+  resolved "https://registry.yarnpkg.com/ono/-/ono-5.0.2.tgz#672e25b2d96b60530c62cf18236cbd82e3249eae"
+  integrity sha512-6XDlkEDQCgHNOdWS5SQlCSEJrJ9Ifh6lGrI8llR/UYOOA83EUVCt+4eWo8LT0rvEfyYSYJG90ExJHnTJqsoPBA==
 
 openapi-schemas@^1.0.0:
   version "1.0.1"
@@ -3952,10 +3952,9 @@ restify-jwt-community@^1.0.9:
     jsonwebtoken "^8.4.0"
     restify-errors "^6.1.1"
 
-restify-swagger-jsdoc@^3.2.2:
+restify-swagger-jsdoc@jrball3/restify-swagger-jsdoc#public-path-option:
   version "3.2.2"
-  resolved "https://registry.yarnpkg.com/restify-swagger-jsdoc/-/restify-swagger-jsdoc-3.2.2.tgz#92f302cdd505e078655fe0bf6a01f22876435229"
-  integrity sha512-F9LB/gz5e58LEMuCYX/UjMP4l19Cp5uxrAm6FWctFftlluHRBDJbf70Qvac294E+H4QvAEvV7YwRmsxqlSFIyw==
+  resolved "https://codeload.github.com/jrball3/restify-swagger-jsdoc/tar.gz/624eceaa7dc5de50f3c7121801b11d4c9ed481ca"
   dependencies:
     mime-types "^2.1.21"
     restify-errors "^6.1.1"

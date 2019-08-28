@@ -7,8 +7,8 @@ function applySwagger (app) {
     openapi: '3.0.0',
     description: 'This is the API documentation for the Topix API.',
     server: app,
-    host: 'localhost:3000',
     path: '/docs',
+    publicPath: `${process.env.BASE_URL}/docs`,
     securityDefinitions: {
       bearerAuth: {
         type: 'apiKey',

@@ -30,7 +30,7 @@
     "restify": "^7.7.0",
     "restify-errors": "^6.1.1",
     "restify-jwt-community": "^1.0.9",
-    "restify-swagger-jsdoc": "^3.2.2",
+    "restify-swagger-jsdoc": "jrball3/restify-swagger-jsdoc#public-path-option",
     "sequelize-cli": "^4.1.1",
     "validator": "^10.11.0"
   },

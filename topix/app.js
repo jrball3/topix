@@ -15,18 +15,22 @@ app.use(restify.plugins.queryParser())
 app.use(restify.plugins.bodyParser())
 app.use(logger('dev'))
 
-// default health check
-app.get('/', (req, res, next) => {
+const healthCheck = (req, res, next) => {
   res.send({'status': 'OK'})
   return next()
-})
+}
+
+app.get('/', healthCheck)
+app.get('/healthz', healthCheck)
 
 const excludeFromAuth = {
   path: [
-    /api\/v1\/auth.*/,
-    { url: /api\/v1\/user.*/, methods: ['POST'] },
+    '/',
+    '/healthz',
     '/docs',
     /\/docs\/+.*/,
+    /api\/v1\/auth.*/,
+    { url: /api\/v1\/user.*/, methods: ['POST'] },
   ]
 }
 
