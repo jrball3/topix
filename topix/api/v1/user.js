@@ -23,11 +23,6 @@ const passwords = require('../../utilities/passwords')
  *         in: formData
  *         required: true
  *         type: string
- *       - name: displayName
- *         description: The name that will be displayed to other users.
- *         in: formData
- *         required: true
- *         type: string
  *       - name: username
  *         description: The user's username for login purposes.
  *         in: formData
@@ -50,7 +45,6 @@ class V1UserApi {
     const schema = Joi.object().keys({
       firstName: Joi.string().required(),
       lastName: Joi.string().required(),
-      displayName: Joi.string(),
       username: Joi.string().lowercase().required(),
       password: Joi.string().required(),
       email: Joi.string().email().required()
@@ -61,7 +55,6 @@ class V1UserApi {
         firstName,
         lastName,
         username,
-        displayName,
         email,
         password
       } = req.body
@@ -73,7 +66,6 @@ class V1UserApi {
           firstName,
           lastName,
           username,
-          displayName,
           email,
           passwordHash: hashedPassword
         })
