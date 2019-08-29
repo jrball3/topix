@@ -13,16 +13,6 @@ const passwords = require('../../utilities/passwords')
  *     produces:
  *       - application/json
  *     parameters:
- *       - name: firstName
- *         description: User's first name
- *         in: formData
- *         required: true
- *         type: string
- *       - name: lastName
- *         description: User's last name.
- *         in: formData
- *         required: true
- *         type: string
  *       - name: username
  *         description: The user's username for login purposes.
  *         in: formData
@@ -43,8 +33,6 @@ const passwords = require('../../utilities/passwords')
 class V1UserApi {
   applyPost (app) {
     const schema = Joi.object().keys({
-      firstName: Joi.string().required(),
-      lastName: Joi.string().required(),
       username: Joi.string().lowercase().required(),
       password: Joi.string().required(),
       email: Joi.string().email().required()
@@ -52,8 +40,6 @@ class V1UserApi {
 
     app.post('/api/v1/user', validator(schema), async (req, res, next) => {
       const {
-        firstName,
-        lastName,
         username,
         email,
         password
@@ -63,8 +49,6 @@ class V1UserApi {
       try {
         const hashedPassword = await passwords.hash(password)
         user = new UserModel({
-          firstName,
-          lastName,
           username,
           email,
           passwordHash: hashedPassword

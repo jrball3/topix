@@ -34,8 +34,6 @@ describe('api', function () {
               response = res
               if (err) throw err
               expect(res).to.have.status(200)
-              expect(res.body.user.firstName).to.equal(user.firstName)
-              expect(res.body.user.lastName).to.equal(user.lastName)
               expect(res.body.user.username).to.equal(user.username)
               expect(res.body.user.email).to.equal(user.email)
               done()
@@ -67,8 +65,6 @@ describe('api', function () {
             .post('/api/v1/user')
             .set('Accept', 'application/x-www-form-urlencoded')
             .send({
-              firstName: user.firstName,
-              lastName: user.lastName,
               email: user.email,
               password: user.password
             })
@@ -86,8 +82,6 @@ describe('api', function () {
             .post('/api/v1/user')
             .set('Accept', 'application/x-www-form-urlencoded')
             .send({
-              firstName: user.firstName,
-              lastName: user.lastName,
               username: user.username,
               password: user.password
             })
@@ -104,8 +98,6 @@ describe('api', function () {
             .post('/api/v1/user')
             .set('Accept', 'application/x-www-form-urlencoded')
             .send({
-              firstName: user.firstName,
-              lastName: user.lastName,
               email: user.email,
               username: user.username
             })
@@ -122,8 +114,6 @@ describe('api', function () {
             .post('/api/v1/user')
             .set('Accept', 'application/x-www-form-urlencoded')
             .send({
-              firstName: user.firstName,
-              lastName: user.lastName,
               username: user.username,
               password: user.password,
               email: 'testemailemail.com'
@@ -145,8 +135,6 @@ describe('api', function () {
               response = res
               if (err) throw err
               expect(res).to.have.status(200)
-              expect(res.body.user.firstName).to.equal(user.firstName)
-              expect(res.body.user.lastName).to.equal(user.lastName)
               expect(res.body.user.username).to.equal(user.username)
               expect(res.body.user.email).to.equal(user.email)
               expect(res.body.user.passwordHash).to.not.equal(null)

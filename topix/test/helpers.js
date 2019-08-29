@@ -8,8 +8,6 @@ const url = 'http://localhost:3000'
 module.exports = {
   mockUserDetails: function () {
     return {
-      firstName: faker.name.firstName(),
-      lastName: faker.name.lastName(),
       email: faker.internet.email().toLowerCase(),
       username: faker.internet.userName().toLowerCase(),
       password: faker.internet.password()
