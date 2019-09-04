@@ -11,7 +11,7 @@ const Joi = require('joi')
  *
  * /api/v1/auth:
  *   post:
- *     description: Create a user account
+ *     description: Authenticate a user session
  *     produces:
  *       - application/json
  *     parameters:
@@ -22,6 +22,18 @@ const Joi = require('joi')
  *         type: string
  *       - name: password
  *         description: User's password.
+ *         in: formData
+ *         required: true
+ *         type: string
+ * 
+ * /api/v1/auth/check:
+ *   post:
+ *     description: Check an authentication token for validity
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: token
+ *         description: The authentication token.
  *         in: formData
  *         required: true
  *         type: string
@@ -65,10 +77,42 @@ class V1AuthApi {
         })
         // retrieve issue and expiration times
         const { iat, exp } = jwt.decode(token)
-        res.send({ 'createdAt': iat, 'expiresAt': exp, token })
+        res.send({ 
+          'createdAt': iat,
+          'expiresAt': exp,
+          token 
+        })
       } catch (err) {
         console.log(err)
-        res.send(errors.InternalServerError(err))
+        res.send(new errors.InternalServerError(err))
+      }
+      return next()
+    })
+  }
+
+  applyCheck (app) {
+    const schema = Joi.object().keys({
+      token: Joi.string().required(),
+    })
+
+    app.post('/api/v1/auth/check', validator(schema), async (req, res, next) => {
+      try {
+        const { token } = req.body
+        const decoded = jwt.decode(token)
+        if (!decoded) {
+          res.send(new errors.UnauthorizedError('Invalid token.'))
+          return next()
+        }
+        const { username, iat, exp } = decoded;
+        res.send({ 
+          username,
+          'createdAt': iat,
+          'expiresAt': exp,
+          token,
+        })
+      } catch (err) {
+        console.log(err)
+        res.send(new errors.InternalServerError(err))
       }
       return next()
     })
@@ -76,6 +120,7 @@ class V1AuthApi {
 
   apply (app) {
     this.applyPost(app)
+    this.applyCheck(app)
   }
 }
 

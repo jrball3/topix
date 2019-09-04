@@ -7,7 +7,7 @@
       "request": "launch",
       "protocol": "inspector",
       "name": "Launch & Attach",
-      "envFile": "${workspaceFolder}/topix/.env",
+      "envFile": "${workspaceFolder}/topix/.env.local",
       "cwd": "${workspaceFolder}/topix",
       "runtimeExecutable": "yarn",
       "runtimeArgs": [
@@ -21,7 +21,7 @@
       "request": "launch",
       "protocol": "inspector",
       "name": "Test & Attach",
-      "envFile": "${workspaceFolder}/topix/.env",
+      "envFile": "${workspaceFolder}/topix/.env.local",
       "cwd": "${workspaceFolder}/topix",
       "runtimeExecutable": "yarn",
       "runtimeArgs": [
