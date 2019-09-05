@@ -8,6 +8,8 @@ const {
   registerUser,
   authUser,
   createGame,
+  fetchOneGame,
+  fetchGames,
 } = require('./helpers')
 const GameType = require('../models/game-type')
 const GameStatus = require('../models/game-status')
@@ -21,7 +23,7 @@ describe('api', function () {
     describe('game', function () {
       const user = mockUserDetails()
       const friend = mockUserDetails()
-      let response, token
+      let response, token, gameId
 
       before(async function () {
         this.timeout(5000)
@@ -36,6 +38,7 @@ describe('api', function () {
           .end(function (err, res) {
             response = res
             if (err) throw err
+            gameId = res.body.game.id
             expect(res).to.have.status(200)
             expect(res.body).to.have.property('game')
             expect(res.body.game.name).to.equal('testGame')
@@ -50,6 +53,13 @@ describe('api', function () {
             expect(res.body.game.scores[0].score).to.equal(50)
             done()
           })
+      })
+
+      it('should return a game when fetched', async function () {
+        const res = await fetchOneGame(token, gameId)
+        response = res
+        expect(res.body).to.have.property('game')
+        expect(res.body.game.id).to.equal(gameId)
       })
 
       it('should create a game with players', function (done) {
@@ -74,6 +84,13 @@ describe('api', function () {
             expect(res.body.game.scores[1].score).to.equal(50)
             done()
           })
+      })
+
+      it('should return all of the players games', async function() {
+        const res = await fetchGames(token)
+        response = res
+        expect(res.body).to.have.property('games')
+        expect(res.body.games).to.have.length(2)
       })
 
       afterEach(function () {

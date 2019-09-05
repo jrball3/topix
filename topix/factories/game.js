@@ -21,7 +21,10 @@ const ScoreFactory = {
 const GameFactory = {
   gameFor: async function(name, type, players) {
     const game = new GameModel({ game, name, type })
-    players.forEach(player => game.addPlayer(player))
+    players.forEach(player => {
+      game.addPlayer(player);
+      player.addGame(game);
+    })
     const scores = ScoreFactory.scoresFor(game)
     return { game, scores };
   }

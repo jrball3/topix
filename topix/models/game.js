@@ -42,10 +42,9 @@ gameSchema.set('toJSON', {
 gameSchema.plugin(timestamp)
 
 gameSchema.methods.addPlayer = function (player) {
-  if (this.status !== GameStatus.ACTIVE) {
-    this.players.push(player)
-  }
+  this.players.push(player)
 }
+
 gameSchema.methods.getLeaderboard = function () {
   try {
     return this.scores.sort({ score: -1 })

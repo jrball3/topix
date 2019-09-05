@@ -25,7 +25,11 @@ const userSchema = new mongoose.Schema({
   passwordHash: {
     type: String,
     required: true
-  }
+  },
+  games: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Game',
+  }],
 })
 
 userSchema.set('toJSON', {
@@ -33,6 +37,10 @@ userSchema.set('toJSON', {
   versionKey:false,
   transform: function (doc, ret) {   delete ret._id  }
 });
+
+userSchema.methods.addGame = function (game) {
+  this.games.push(game)
+}
 
 userSchema.plugin(timestamp)
 userSchema.plugin(friends())

@@ -9,9 +9,9 @@ const GameFactory = require('../../factories/game')
 /**
  * @swagger
  * 
- * /api/v1/game/:
+ * /api/v1/game:
  *   get:
- *     description: Fetch the state of a game
+ *     description: Fetch all games for the player
  *     produces:
  *       - application/json
  *     parameters:
@@ -36,7 +36,7 @@ const GameFactory = require('../../factories/game')
  *         required: true
  *         type: string
  *       - name: players
- *         description: The name of the game.
+ *         description: The players in the game.
  *         in: formData
  *         required: true
  *         type: array
@@ -48,6 +48,18 @@ const GameFactory = require('../../factories/game')
  *             bearerFormat: JWT  # optional, for documentation purposes only
  *       - security:
  *         - bearerAuth: []
+ * 
+ * /api/v1/game/{gameId}:
+ *   get:
+ *     description: Fetch a game
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: gameId
+ *         description: The ID of the game.
+ *         in: path
+ *         required: true
+ *         type: string
 */
 
 class V1GameApi {
@@ -57,11 +69,24 @@ class V1GameApi {
       gameId: Joi.string().required(),
     })
 
-    app.get('/api/v1/game', validator(schema), async (req, res, next) => {
+    app.get('/api/v1/game/:gameId', validator(schema), async (req, res, next) => {
       try {
-        const { gameId } = req.body
+        const { gameId } = req.params
         const game = await GameModel.findById(gameId)
         res.send({ game })
+      } catch (err) {
+        res.send(errors.InternalServerError(err))
+      }
+      return next()
+    })
+  }
+
+  applyIndex (app) {
+    app.get('/api/v1/game', async (req, res, next) => {
+      const { user } = req;
+      try {
+        const games = await user.populate('games').games
+        res.send({ games })
       } catch (err) {
         res.send(errors.InternalServerError(err))
       }
@@ -98,6 +123,7 @@ class V1GameApi {
         }))
 
         const { game, scores } = await GameFactory.gameFor(name, type, players)
+        await Promise.all(players.map(p => p.save()))
         await Promise.all(scores.map(s => s.save()))
         game.scores.push(...scores)
         await game.save()
@@ -135,6 +161,7 @@ class V1GameApi {
 
   apply (app) {
     this.applyGet(app)
+    this.applyIndex(app)
     this.applyPost(app)
   }
 }

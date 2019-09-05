@@ -54,12 +54,20 @@ module.exports = {
       })
   ),
 
-  fetchGame: (token, gameId) => (
+  fetchOneGame: (token, gameId) => (
+    chai.request(url)
+      .get(`/api/v1/game/${gameId}`)
+      .set('Accept', 'application/x-www-form-urlencoded')
+      .set('Authorization', `Bearer ${token}`)
+      .send()
+  ),
+
+  fetchGames: (token) => (
     chai.request(url)
       .get('/api/v1/game')
       .set('Accept', 'application/x-www-form-urlencoded')
       .set('Authorization', `Bearer ${token}`)
-      .send({ gameId  })
+      .send()
   ),
 
   fetchScores: (token, gameId) => (
