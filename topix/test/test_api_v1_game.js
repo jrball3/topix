@@ -91,6 +91,7 @@ describe('api', function () {
         response = res
         expect(res.body).to.have.property('games')
         expect(res.body.games).to.have.length(2)
+        expect(res.body.games[0]).to.have.property('name')
       })
 
       afterEach(function () {

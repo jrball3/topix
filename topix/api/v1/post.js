@@ -178,6 +178,7 @@ class V1PostApi {
           .findById(postId)
           .populate('game')
           .populate('author')
+          .exec();
 
         if (!post) {
           res.send(new errors.ResourceNotFoundError(`Post ${postId} not found!`))
@@ -228,6 +229,7 @@ class V1PostApi {
           .findById(postId)
           .populate('game')
           .populate('author')
+          .exec()
 
         if (!post) {
           res.send(new errors.ResourceNotFoundError(`Post ${postId} not found!`))

@@ -38,11 +38,13 @@ class V1ScoreApi {
         if (scoreId) {
           scores = [await ScoreModel
             .findById(scoreId)
-            .populate('player')]
+            .populate('player')
+            .exec()]
         } else {
           scores = await ScoreModel
             .find({ 'game': gameId })
             .populate('player')
+            .exec()
         }
         res.send({ scores })
       } catch (err) {

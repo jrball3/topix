@@ -14,12 +14,6 @@ const GameFactory = require('../../factories/game')
  *     description: Fetch all games for the player
  *     produces:
  *       - application/json
- *     parameters:
- *       - name: gameId
- *         description: The ID of the game.
- *         in: formData
- *         required: true
- *         type: string
  *   post:
  *     description: Create a game
  *     produces:
@@ -85,8 +79,8 @@ class V1GameApi {
     app.get('/api/v1/game', async (req, res, next) => {
       const { user } = req;
       try {
-        const games = await user.populate('games').games
-        res.send({ games })
+        const populated = await user.populate('games').execPopulate();
+        res.send({ games: populated.games })
       } catch (err) {
         res.send(errors.InternalServerError(err))
       }
@@ -143,7 +137,8 @@ class V1GameApi {
             path: 'scores',
             // Get friends of friends - populate the 'friends' array for every friend
             populate: { path: 'player' }
-          });
+          })
+          .exec();
 
         res.send({
           game: retGame,
