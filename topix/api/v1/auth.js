@@ -103,7 +103,12 @@ class V1AuthApi {
           res.send(new errors.UnauthorizedError('Invalid token.'))
           return next()
         }
+
         const { username, iat, exp } = decoded;
+
+        const user = await UserModel.findOne({ username }).exec();
+        if (!user) throw Error('User not found.')
+                
         res.send({ 
           username,
           'createdAt': iat,
