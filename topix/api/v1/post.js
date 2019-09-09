@@ -170,7 +170,7 @@ class V1PostApi {
       postId: Joi.string().required(),
     })
 
-    app.post('/api/v1/post/:postId/upvote', validator(schema), async (req, res, next) => {
+    app.post('/api/v1/post/:postId/upvote', validator(schema, 'params'), async (req, res, next) => {
       try {
         const { user } = req
         const { postId } = req.params
@@ -221,7 +221,7 @@ class V1PostApi {
       postId: Joi.string().required(),
     })
 
-    app.post('/api/v1/post/:postId/downvote', validator(schema), async (req, res, next) => {
+    app.post('/api/v1/post/:postId/downvote', validator(schema, 'params'), async (req, res, next) => {
       try {
         const { user } = req
         const { postId } = req.params
