@@ -36,8 +36,11 @@ const gameSchema = new mongoose.Schema({
 gameSchema.set('toJSON', {
   virtuals: true,
   versionKey:false,
-  transform: function (doc, ret) {   delete ret._id  }
-});
+  transform: function (doc, ret) {
+    delete ret._id
+    return ret
+  }}
+);
 
 gameSchema.plugin(timestamp)
 

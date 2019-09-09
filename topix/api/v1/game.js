@@ -133,6 +133,7 @@ class V1GameApi {
             path: 'posts',
             populate: { path: 'downvotes' }
           })
+          .populate('scores')
           .populate({
             path: 'scores',
             // Get friends of friends - populate the 'friends' array for every friend

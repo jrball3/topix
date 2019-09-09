@@ -17,7 +17,10 @@ const downvoteSchema = new mongoose.Schema({
 downvoteSchema.set('toJSON', {
   virtuals: true,
   versionKey:false,
-  transform: function (doc, ret) {   delete ret._id  }
+  transform: function (doc, ret) {
+    delete ret._id
+    return ret
+  }
 });
 
 downvoteSchema.plugin(timestamp)

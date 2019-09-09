@@ -78,9 +78,10 @@ class V1AuthApi {
         // retrieve issue and expiration times
         const { iat, exp } = jwt.decode(token)
         res.send({ 
+          user,
+          token,
           'createdAt': iat,
           'expiresAt': exp,
-          token 
         })
       } catch (err) {
         console.log(err)
@@ -110,10 +111,10 @@ class V1AuthApi {
         if (!user) throw Error('User not found.')
                 
         res.send({ 
-          username,
+          user,
+          token,
           'createdAt': iat,
           'expiresAt': exp,
-          token,
         })
       } catch (err) {
         console.log(err)

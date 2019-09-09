@@ -34,8 +34,13 @@ const userSchema = new mongoose.Schema({
 
 userSchema.set('toJSON', {
   virtuals: true,
-  versionKey:false,
-  transform: function (doc, ret) {   delete ret._id  }
+  versionKey: false,
+  transform: function (doc, ret) {
+    delete ret._id  
+    delete ret.passwordHash
+    delete ret.games
+    return ret
+  }
 });
 
 userSchema.methods.addGame = function (game) {
