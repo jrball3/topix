@@ -13,7 +13,7 @@ require('./database')
 const app = restify.createServer()
 app.use(restify.plugins.queryParser())
 app.use(restify.plugins.bodyParser())
-app.use(logger('dev'))
+app.use(logger('combined'))
 
 const healthCheck = (req, res, next) => {
   res.send({'status': 'OK'})
