@@ -169,7 +169,7 @@ describe('api', function () {
             expect(res).to.have.status(200)
           })
         await chai.request(url)
-          .get(`/api/v1/friendship`)
+          .get(`/api/v1/friendship/pending`)
           .set('Accept', 'application/x-www-form-urlencoded')
           .set('Authorization', `Bearer ${user2Token}`)
           .send()
