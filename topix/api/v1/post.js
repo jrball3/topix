@@ -88,7 +88,7 @@ class V1PostApi {
     app.get('/api/v1/post/:postId', validator(schema, 'params'), async (req, res, next) => {
       try {
         const { postId } = req.params
-        const post = await PostModel.findById(postId)
+        const post = await PostModel.findById(postId).exec()
         res.send({ post })
       }
       catch (err) {
@@ -107,12 +107,12 @@ class V1PostApi {
     app.get('/api/v1/post', validator(schema), async (req, res, next) => {
       try {
         const { gameId } = req.query
-        const game = await GameModel.findById(gameId)
+        const game = await GameModel.findById(gameId).exec()
         if (!game) {
           res.send(new errors.ResourceNotFoundError(`Game ${gameId} not found`))
           return next()
         }
-        const posts = await PostModel.find({ game: gameId })
+        const posts = await PostModel.find({ game: gameId }).exec()
         res.send({ posts })
       }
       catch (err) {
@@ -133,7 +133,7 @@ class V1PostApi {
       try {
         const { user } = req
         const { gameId, message } = req.body
-        const game = await GameModel.findById(gameId)
+        const game = await GameModel.findById(gameId).exec()
         if (!game) {
           res.send(new errors.ResourceNotFoundError(`Game ${gameId} not found`))
           return next()
