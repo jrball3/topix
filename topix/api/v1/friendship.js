@@ -179,15 +179,23 @@ class V1FriendshipApi {
             res.send(new errors.BadRequestError('User does not have this friendship.'))
             return next()
           }
-          UserModel.removeFriend(user._id, req.params.friendshipId, function (err, fs) {
-            if (err) {
-              console.error(err)
-              res.send(new errors.InternalServerError(err))
-              return next()
-            }
-            res.send({'friendship': fs})
-            return next();
-          });
+          UserModel.findById(req.params.friendshipId)
+          .then(function (friend) {
+            user.removeFriend(friend, function (err, fs) {
+              if (err) {
+                console.error(err)
+                res.send(new errors.InternalServerError(err))
+                return next()
+              }
+              res.send()
+              return next();
+            });
+          })
+          .catch((error) => {
+            console.error(err)
+            res.send(new errors.InternalServerError(err))
+            return next()
+          })
         })
       }
       catch (err) {

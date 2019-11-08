@@ -109,12 +109,16 @@ class V1AuthApi {
 
         const user = await UserModel.findOne({ username }).exec();
         if (!user) throw Error('User not found.')
+
+        const expiryAsDate = new Date(exp * 1000)
+        const expired = expiryAsDate <= Date.now()
                 
         res.send({ 
           user,
           token,
           'createdAt': iat,
           'expiresAt': exp,
+          'valid': !expired
         })
       } catch (err) {
         console.log(err)
